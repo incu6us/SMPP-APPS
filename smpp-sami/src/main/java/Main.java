@@ -45,9 +45,8 @@ public class Main {
 			System.out.println("2-----------------");
 		}
 
-//		Thread.sleep(5000);
-//		smpp.unbind();
-
+		Thread.sleep(5000);
+		smpp.unbind();
 		/*
 		 * add settings
 		 */
