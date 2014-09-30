@@ -36,6 +36,7 @@ import org.smpp.util.ByteBuffer;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import ch.qos.logback.core.joran.action.NewRuleAction;
+import ua.com.life.smpp.db.domain.SmppSettings;
 import ua.com.life.smpp.db.service.SmppManage;
 
 public class SMPPConnection extends Thread  {
@@ -139,6 +140,18 @@ public class SMPPConnection extends Thread  {
 		setDaemon(true);
 		start();
 	}
+	
+	public SMPPConnection(SmppSettings settings) throws IOException{
+		this.sessName = settings.getName();
+		this.systemId = settings.getSystemId();
+		this.password = settings.getPassword();
+		this.ipAddress = settings.getHost();
+		this.port = settings.getPort();
+		
+		loadProperties(propsFilePath);
+		setDaemon(true);
+		start();
+	}
 
 	/**
 	 * Sets global SMPP library debug and event objects. Runs the application.
@@ -199,7 +212,7 @@ public class SMPPConnection extends Thread  {
 					while(true){
 						enquireLink();
 						try {
-							Thread.sleep(1000);
+							Thread.sleep(60000);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -229,7 +242,6 @@ public class SMPPConnection extends Thread  {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
 			bind();
 		}
 	}
@@ -530,4 +542,5 @@ public class SMPPConnection extends Thread  {
 	public void destroy(){
 		unbind();
 	}
+	
 }

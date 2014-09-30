@@ -14,10 +14,12 @@ import ua.com.life.smpp.sami.smpp.SMPPConnection;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+
 		ApplicationContext ctx = new FileSystemXmlApplicationContext(
 				"src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml");
 
-		SmppManage smppSettings = (SmppManage) ctx.getBean("smppManageImpl");
+		final SmppManage smppSettings = (SmppManage) ctx
+				.getBean("smppManageImpl");
 
 		String destAddress = "ervge";
 		String shortMessage = "test";
@@ -25,28 +27,58 @@ public class Main {
 		byte senderTon = 0x05;
 		byte senderNpi = 0x00;
 
-		Long id = smppSettings.getActiveAccount(new Long(2)).getId();
-		System.out.println("account id: "+id);
-		String sessName = smppSettings.getActiveAccount(new Long(2)).getName();
-		String systemId = smppSettings.getActiveAccount(new Long(2)).getSystemId();
-		String password = smppSettings.getActiveAccount(new Long(2)).getPassword();
-		String ipAddress = smppSettings.getActiveAccount(new Long(2)).getHost();
-		int port = smppSettings.getActiveAccount(new Long(2)).getPort();
-
 		
-		final SMPPConnection smpp = new SMPPConnection(sessName, systemId, password, ipAddress, port);
-
-		smpp.bind();
-		System.out.println("1-----------------");
-		Thread.sleep(2000);
 		
-		for(int i = 0; i<100; i++){
-			smpp.submit(destAddress, shortMessage+" - "+i, sender, senderTon, senderNpi);
-			System.out.println("2-----------------");
+		for (final SmppSettings smpp : smppSettings.getActiveAccounts()) {
+			Thread t = new Thread(new Runnable() {
+				SMPPConnection connection;
+
+				@Override
+				public void run() {
+					try {
+						connection = new SMPPConnection(smpp);
+						connection.bind();
+						System.out.println("--->Current thread: "+Thread.currentThread().getName());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+			});
+			t.setName(smpp.getSystemId());
+			t.start();
 		}
+		
 
-		Thread.sleep(5000);
-		smpp.unbind();
+		// Long id = smppSettings.getActiveAccount(new Long(2)).getId();
+		// System.out.println("account id: "+id);
+		// String sessName = smppSettings.getActiveAccount(new
+		// Long(2)).getName();
+		// String systemId = smppSettings.getActiveAccount(new
+		// Long(2)).getSystemId();
+		// String password = smppSettings.getActiveAccount(new
+		// Long(2)).getPassword();
+		// String ipAddress = smppSettings.getActiveAccount(new
+		// Long(2)).getHost();
+		// int port = smppSettings.getActiveAccount(new Long(2)).getPort();
+		//
+		//
+		// final SMPPConnection smpp = new SMPPConnection(sessName, systemId,
+		// password, ipAddress, port);
+		//
+		// smpp.bind();
+		// System.out.println("1-----------------");
+		// Thread.sleep(2000);
+		//
+		// for(int i = 0; i<100; i++){
+		// smpp.submit(destAddress, shortMessage+" - "+i, sender, senderTon,
+		// senderNpi);
+		// System.out.println("2-----------------");
+		// }
+
+		// Thread.sleep(5000);
+		// smpp.unbind();
 		/*
 		 * add settings
 		 */

@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="msisdn_list")
 public class MsisdnList {
-	
+
 	@Id
 	@GeneratedValue
 	private Long Id;
