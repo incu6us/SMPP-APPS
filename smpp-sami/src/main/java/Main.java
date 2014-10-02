@@ -27,6 +27,9 @@ public class Main {
 		byte senderTon = 0x05;
 		byte senderNpi = 0x00;
 
+		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
+			System.out.println(smpp.getName());
+		}
 		
 		
 		for (final SmppSettings smpp : smppSettings.getActiveAccounts()) {
@@ -50,7 +53,7 @@ public class Main {
 			t.start();
 		}
 		
-
+//		Thread t = new Thread().getName().equals()
 		// Long id = smppSettings.getActiveAccount(new Long(2)).getId();
 		// System.out.println("account id: "+id);
 		// String sessName = smppSettings.getActiveAccount(new

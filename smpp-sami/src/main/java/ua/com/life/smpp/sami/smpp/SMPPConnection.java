@@ -46,9 +46,11 @@ public class SMPPConnection extends Thread  {
 	/**
 	 * File with default settings for the application.
 	 */
-	static String propsFilePath = "src/main/resources/smppparams.cfg";
+//	static String propsFilePath = "src/main/resources/smppparams.cfg";
+	static String propsFilePath = "smppparams.cfg";
 	{
-		System.out.println(new File(".").getCanonicalPath());
+		System.out.println("Absolute path path: "+new File(".").getCanonicalPath());
+		LOGGER.info("Cannonical path: "+ new File(".").getCanonicalPath());
 	}
 	/**
 	 * This is the SMPP session used for communication with SMSC.
@@ -430,7 +432,7 @@ public class SMPPConnection extends Thread  {
 	 */
 	private void loadProperties(String fileName) throws IOException {
 		System.out.println("Reading configuration file " + fileName + "...");
-		FileInputStream propsFile = new FileInputStream(fileName);
+		FileInputStream propsFile = new FileInputStream("../applications/sami/WEB-INF/classes/"+fileName);
 		properties.load(propsFile);
 		propsFile.close();
 		System.out.println("Setting default parameters...");
