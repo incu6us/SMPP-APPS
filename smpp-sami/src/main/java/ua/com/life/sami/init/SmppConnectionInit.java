@@ -15,33 +15,44 @@ public class SmppConnectionInit {
 
 	@Autowired
 	private SmppManage smppSettings;
-	
+
+	private SMPPConnection connection;
+
 	@PostConstruct
-	public void init(){
-		for (final SmppSettings smpp : smppSettings.getActiveAccounts()) {
-			Thread t = new Thread(new Runnable() {
-				SMPPConnection connection;
+	public void init() {
+		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
 
-				@Override
-				public void run() {
-					try {
-						connection = new SMPPConnection(smpp);
-						connection.bind();
-						System.out.println("--->Current thread: "+Thread.currentThread().getName());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+			try {
+				connection = new SMPPConnection(smpp);
+				Thread conn = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						connection.bind();	
 					}
-
-				}
-			});
-			t.setName(smpp.getSystemId());
-			t.start();
+				});
+				conn.setDaemon(true);
+				conn.setName(smpp.getSystemId());
+				conn.start();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		return;
 	}
 
 	@PreDestroy
-	public void destroy(){
-		
+	public void destroy() {
+//		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
+//			try {
+//				connection = new SMPPConnection(smpp);
+//				connection.unbind();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 	}
 }
