@@ -33,15 +33,14 @@ public class SmppConnectionInit {
 			Thread conn = new Thread(new Runnable() {
 
 				@Override
-				public synchronized void run() {
+				public void run() {
 					// TODO Auto-generated method stub
 					connection = new SMPPConnection(smpp);
 					connection.bind();
-//					connection.enquireLinkSend();
 				}
 			});
 //			conn.setDaemon(true);
-//			conn.setName(smpp.getSystemId());
+			conn.setName(smpp.getSystemId());
 			conn.start();
 		}
 	}

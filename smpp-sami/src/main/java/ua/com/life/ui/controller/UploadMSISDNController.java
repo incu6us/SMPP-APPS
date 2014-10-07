@@ -1,9 +1,11 @@
 package ua.com.life.ui.controller;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -31,19 +33,24 @@ public class UploadMSISDNController {
 //		String fileName = null;
 		if (!file.isEmpty()) {
 			try {
-
+				StringBuffer textFromFile = new StringBuffer();
+				
 				InputStream inputStream = file.getInputStream();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 				
-				int read = 0;
-				byte[] bytes = new byte[4098];
-				char content;
+				String str = null;
 				
-				while((read = inputStream.read(bytes))!=-1){
-					content = (char) read;
-					System.out.println(content);
+				while((str = reader.readLine()) != null){
+					textFromFile.append(str);
+					if(reader.ready()){
+						textFromFile.append("\r\n");
+					}
 				}
 				
+				reader.close();
 				inputStream.close();
+				
+				System.out.println(textFromFile);
 				
 //				byte[] bytes = file.getBytes();
 //
