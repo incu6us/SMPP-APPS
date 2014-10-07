@@ -3,8 +3,8 @@ package ua.com.life.smpp.sami.smpp;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.smpp.Data;
 import org.smpp.Session;
+import org.smpp.TimeoutException;
 import org.smpp.WrongSessionStateException;
 import org.smpp.debug.Debug;
 import org.smpp.debug.Event;
@@ -13,8 +13,7 @@ import org.smpp.pdu.DeliverSMResp;
 import org.smpp.pdu.EnquireLink;
 import org.smpp.pdu.EnquireLinkResp;
 import org.smpp.pdu.PDU;
-import org.smpp.pdu.SubmitSM;
-import org.smpp.pdu.SubmitSMResp;
+import org.smpp.pdu.PDUException;
 import org.smpp.pdu.ValueNotSetException;
 
 public class PDUReceiver extends Thread {
@@ -59,7 +58,32 @@ public class PDUReceiver extends Thread {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				} 
+				}
+				else if(pdu instanceof EnquireLinkResp){
+					EnquireLink enqLink = new EnquireLink();
+					try {
+						EnquireLinkResp enqLinkResp = session.enquireLink(enqLink);
+						System.out.println("EnquireLinkResp: "+enqLinkResp.debugString());
+					} catch (ValueNotSetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (TimeoutException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (PDUException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (WrongSessionStateException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+//					EnquireLinkResp enqLinkResp = (EnquireLinkResp) pdu;
+//					enqLinkResp.setSequenceNumber(enqLink.getSequenceNumber());
+				}
+				
 //				else {
 //					System.out.println("SubmitSMResp");
 //					SubmitSMResp s = (SubmitSMResp) pdu;
@@ -69,7 +93,7 @@ public class PDUReceiver extends Thread {
 			}
 
 			try {
-				Thread.sleep(2);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -79,9 +103,9 @@ public class PDUReceiver extends Thread {
 	private PDU receive() {
 		PDU pdu = null;
 		try {
-			pdu = this.session.getReceiver().receive(0);
+			pdu = session.getReceiver().receive(0);
 			if (pdu != null) {
-				pdu.debugString();
+//				pdu.debugString();
 				System.out.println("Received PDU " + pdu.debugString());
 			} else {
 				System.out.println("No PDU received this time.");
@@ -89,9 +113,10 @@ public class PDUReceiver extends Thread {
 		} catch (Exception e) {
 			event.write(e, "");
 			debug.write("Receiving failed. " + e);
-			// System.out.println("Receiving failed. " + e);
-		} finally {
-			// debug.exit(this);
+			System.out.println("Receiving failed. " + e);
+		} 
+		finally {
+//			 debug.exit(this);
 		}
 		return pdu;
 	}
@@ -102,31 +127,26 @@ public class PDUReceiver extends Thread {
 			EnquireLinkResp response;
 			System.out.println("Enquire Link request " + request.debugString());
 			LOGGER.debug("Enquire Link request " + request.debugString());
-			
 			response = session.enquireLink(request);
 			System.out.println("Enquire Link response "
 					+ response.debugString());
-			LOGGER.debug("Enquire Link response "
-					+ response.debugString());
+			LOGGER.debug("Enquire Link response " + response.debugString());
 		} catch (Exception e) {
 			System.out.println("Enquire Link operation failed. " + e);
-			LOGGER.warn("Enquire Link operation failed. " + e + "\n\rRebinding...");
-			
-//			this.bound = false;
-//			unbind();
-
+			LOGGER.warn("Enquire Link operation failed. " + e
+					+ "\n\rRebinding...");
+			// this.bound = false;
+			// unbind();
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e1) {
-				LOGGER.warn("Thread sleep failed on reconnection: "+e1);
+				LOGGER.warn("Thread sleep failed on reconnection: " + e1);
 			}
-			
-//			bind();
-			
+			// bind();
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e1) {
-				LOGGER.warn("Thread sleep failed on reconnection: "+e1);
+				LOGGER.warn("Thread sleep failed on reconnection: " + e1);
 			}
 		}
 	}

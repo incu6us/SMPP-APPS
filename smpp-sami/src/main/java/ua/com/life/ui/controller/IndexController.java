@@ -24,23 +24,29 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import ua.com.life.sami.init.SmppConnectionInit;
+import ua.com.life.smpp.db.domain.SmppSettings;
 import ua.com.life.smpp.db.service.SmppManage;
+import ua.com.life.smpp.sami.smpp.SMPPConnection;
 
 @Controller
 @RequestMapping(value = { "/", "/index" })
 public class IndexController {
-
+	
 	private static Logger LOGGER = Logger.getLogger(IndexController.class);
 
 	@Autowired
 	private SmppManage smppSettings;
+	
+	private SMPPConnection connection;
+	
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String hello(Model model) throws NoSuchAlgorithmException {
 
 		model.addAttribute("pageName", "index");
 		model.addAttribute("smppSettings", smppSettings.getActiveAccounts());
-
+		
 		return "index";
 	}
 	

@@ -38,14 +38,10 @@ public class Main {
 
 				@Override
 				public void run() {
-					try {
-						connection = new SMPPConnection(smpp);
-						connection.bind();
-						System.out.println("--->Current thread: "+Thread.currentThread().getName());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					connection = new SMPPConnection(smpp);
+					connection.bind();
+					connection.enquireLinkSend();
+					System.out.println("--->Current thread: "+Thread.currentThread().getName());
 
 				}
 			});

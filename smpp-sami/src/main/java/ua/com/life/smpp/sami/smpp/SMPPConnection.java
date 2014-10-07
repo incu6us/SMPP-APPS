@@ -39,19 +39,24 @@ import ch.qos.logback.core.joran.action.NewRuleAction;
 import ua.com.life.smpp.db.domain.SmppSettings;
 import ua.com.life.smpp.db.service.SmppManage;
 
-public class SMPPConnection extends Thread  {
+public class SMPPConnection  {
 	
 	private static Logger LOGGER = Logger.getLogger(SMPPConnection.class);
 
 	/**
 	 * File with default settings for the application.
 	 */
-//	static String propsFilePath = "src/main/resources/smppparams.cfg";
-	static String propsFilePath = "smppparams.cfg";
-	{
-		System.out.println("Absolute path path: "+new File(".").getCanonicalPath());
-		LOGGER.info("Cannonical path: "+ new File(".").getCanonicalPath());
-	}
+	private static String propsFilePath = "src/main/resources/smppparams.cfg";
+//	static String propsFilePath = "smppparams.cfg";
+//	{
+//		try {
+//			System.out.println("Absolute path path: "+new File(".").getCanonicalPath());
+//			LOGGER.info("Cannonical path: "+ new File(".").getCanonicalPath());
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 	/**
 	 * This is the SMPP session used for communication with SMSC.
 	 */
@@ -131,28 +136,48 @@ public class SMPPConnection extends Thread  {
 	 * @throws IOException 
 	 */
 
-	public SMPPConnection(String sessName, String systemId, String password, String ipAddress, int port) throws IOException {
+	
+	
+	public SMPPConnection(String sessName, String systemId, String password, String ipAddress, int port) {
 		this.sessName = sessName;
 		this.systemId = systemId;
 		this.password = password;
 		this.ipAddress = ipAddress;
 		this.port = port;
 		
-		loadProperties(propsFilePath);
-		setDaemon(true);
-		start();
+		try {
+			loadProperties(propsFilePath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		setDaemon(true);
+//		start();
 	}
 	
-	public SMPPConnection(SmppSettings settings) throws IOException{
+	public void setBound(boolean bound) {
+		this.bound = bound;
+	}
+
+	public boolean getBound(){
+		return bound;
+	}
+	
+	public SMPPConnection(SmppSettings settings) {
 		this.sessName = settings.getName();
 		this.systemId = settings.getSystemId();
 		this.password = settings.getPassword();
 		this.ipAddress = settings.getHost();
 		this.port = settings.getPort();
 		
-		loadProperties(propsFilePath);
-		setDaemon(true);
-		start();
+		try {
+			loadProperties(propsFilePath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		setDaemon(true);
+//		start();
 	}
 
 	/**
@@ -182,70 +207,78 @@ public class SMPPConnection extends Thread  {
 	 */
 
 	public synchronized void bind() {
-		try {
-			if (bound) {
-				System.out.println("Already bound (" + this.sessName + "), unbind first.");
-				return;
-			}
-			BindRequest request = null;
-			BindResponse response = null;
-//			request = new BindTransmitter();
-			request = new BindTransciever();
-			TCPIPConnection connection = new TCPIPConnection(ipAddress, port);
-//			connection.setReceiveTimeout(20 * 1000);
-			session = new Session(connection);
-			// set values
-			request.setSystemId(systemId);
-			request.setPassword(password);
-			request.setSystemType(systemType);
-			request.setInterfaceVersion((byte) 0x34);
-			request.setAddressRange(addressRange);
-			// send the request
-			System.out.println("Bind request " + request.debugString());
-			response = session.bind(request);
-
-			pduReceiver = new PDUReceiver(session);
-			pduReceiver.start();
-			
-			enquireLinkThread = new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					while(true){
-						enquireLink();
-						try {
-							Thread.sleep(60000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
+			try{
+				if (isBound()) {
+					System.out.println("Already bound (" + this.sessName + "), unbind first.");
+					return;
 				}
-			});
-			
-			enquireLinkThread.setDaemon(true);
-			enquireLinkThread.setName("enquireLink");
-			enquireLinkThread.start();
-			
-			System.out.println("Bind response " + response.debugString());
-			if (response.getCommandStatus() == Data.ESME_ROK) {
-				bound = true;
-			} else {
-				System.out.println("Bind failed for " + this.sessName + ", code "
-						+ response.getCommandStatus());
+			}catch (NullPointerException e) {
 			}
-		} catch (Exception e) {
-			System.out.println("Bind operation failed. " + e);
-			LOGGER.error("Bind operation failed. "+ this.sessName + ": " + e);
 			
 			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				BindRequest request = null;
+				BindResponse response = null;
+	//			request = new BindTransmitter();
+				request = new BindTransciever();
+				TCPIPConnection connection = new TCPIPConnection(ipAddress, port);
+	//			connection.setReceiveTimeout(20 * 1000);
+				session = new Session(connection);
+				// set values
+				request.setSystemId(systemId);
+				request.setPassword(password);
+				request.setSystemType(systemType);
+				request.setInterfaceVersion((byte) 0x34);
+				request.setAddressRange(addressRange);
+				// send the request
+				System.out.println("Bind request " + request.debugString());
+				response = session.bind(request);
+	
+				Thread.sleep(1000);
+				
+				pduReceiver = new PDUReceiver(session);
+				pduReceiver.start();
+				
+				Thread.sleep(1000);
+				
+				enquireLinkThread = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						while(true){
+							enquireLink();
+							try {
+								Thread.sleep(5000);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				});
+				
+//				enquireLinkThread.setDaemon(true);
+//				enquireLinkThread.setName("enquireLink");
+				enquireLinkThread.start();
+				
+				System.out.println("Bind response " + response.debugString());
+				if (response.getCommandStatus() == Data.ESME_ROK) {
+//					bound = true;
+					setBound(true);
+				} else {
+					System.out.println("Bind failed for " + this.sessName + ", code "
+							+ response.getCommandStatus());
+				}
+			} catch (Exception e) {
+				System.out.println("Bind operation failed. " + e);
+				LOGGER.error("Bind operation failed. "+ this.sessName + ": " + e);
+				
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				bind();
 			}
-			bind();
-		}
 	}
 
 	/**
@@ -254,13 +287,17 @@ public class SMPPConnection extends Thread  {
 	
 	public Boolean isBound(){
 		
-		 if(session.isBound()){
-			 this.bound = true;
-		 }else{
-			 this.bound = false;
-		 }
-		
-		return this.bound;
+		try {
+			if (session.isBound() && session.isOpened()) {
+				setBound(true);
+			} else {
+				setBound(false);
+			}
+		} catch (Exception e) {
+			setBound(false);
+		}finally{
+			return getBound();
+		}
 	}
 	
 	/**
@@ -272,14 +309,13 @@ public class SMPPConnection extends Thread  {
 	 * @see Unbind
 	 * @see UnbindResp
 	 */
-	public synchronized void unbind() {
+	public void unbind() {
 		try {
-			if(!session.isBound()){
-				bound = false;
-			}
 
-			if (!bound) {
-				System.out.println("Not bound, cannot unbind: "+ this.sessName);
+			isBound();
+
+			if (!getBound()) {
+				System.out.println("Not bound, cannot unbind: "+ sessName);
 				return;
 			}
 			// send the request
@@ -287,15 +323,23 @@ public class SMPPConnection extends Thread  {
 			if (session.getReceiver().isReceiver()) {
 				System.out.println("It can take a while to stop the receiver.");
 			}
-			enquireLinkThread.stop();
-			pduReceiver.stop();
+//			enquireLinkThread.stop();
+//			pduReceiver.stop();
 			UnbindResp response = session.unbind();
-			this.session.close();
+			session.close();
 			System.out.println("Unbind response " + response.debugString());
-			bound = false;
+			setBound(false);
 		} catch (Exception e) {
 			System.out.println("Unbind operation failed. " + e);
-			LOGGER.warn("Unbind operation failed. " + this.sessName + ": " + e);
+			LOGGER.warn("Unbind operation failed. " + sessName + ": " + e);
+			try {
+				setBound(false);
+				session.close();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			setBound(false);
 		}
 	}
 
@@ -367,7 +411,7 @@ public class SMPPConnection extends Thread  {
 			System.out.println("Submit operation failed. " + e);
 			LOGGER.error("Submit operation failed. " + e);
 			if(!isBound() || !session.isOpened()){
-				this.bound = false;
+				setBound(false);
 				bind();
 				try {
 					Thread.sleep(2000);
@@ -395,35 +439,64 @@ public class SMPPConnection extends Thread  {
 		try {
 			EnquireLink request = new EnquireLink();
 			EnquireLinkResp response;
-			System.out.println("Enquire Link request " + request.debugString());
-			LOGGER.debug("Enquire Link request " + request.debugString());
+			System.out.println(sessName+": Enquire Link request " + request.debugString());
+			LOGGER.debug(sessName+": Enquire Link request " + request.debugString());
 			
 			response = session.enquireLink(request);
-			System.out.println("Enquire Link response "
+			System.out.println(sessName+": Enquire Link response "
 					+ response.debugString());
-			LOGGER.debug("Enquire Link response "
+			LOGGER.debug(sessName+": Enquire Link response "
 					+ response.debugString());
 		} catch (Exception e) {
-			System.out.println("Enquire Link operation failed. " + e);
-			LOGGER.warn("Enquire Link operation failed. " + e + "\n\rRebinding for system_id: " + this.systemId + "...");
+			System.out.println(sessName+": Enquire Link operation failed. " + e);
+			LOGGER.warn(sessName+": Enquire Link operation failed. " + e + "\n\rRebinding for system_id: " + systemId + "...");
 			
-			this.bound = false;
-			unbind();
-
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e1) {
-				LOGGER.warn("Thread sleep failed on reconnection: "+e1);
+			try{
+				unbind();
+			}catch(Exception e1){
+				e1.printStackTrace();
 			}
 			
-			bind();
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e1) {
+				LOGGER.warn(sessName+": Thread sleep failed on reconnection: "+e1);
+				System.out.println(sessName+": Thread sleep failed on reconnection: "+e1);
+			}
+			
+			try{
+				bind();
+			}catch(Exception e1){
+				e1.printStackTrace();
+			}
 			
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e1) {
-				LOGGER.warn("Thread sleep failed on reconnection: "+e1);
+				LOGGER.warn(sessName+": Thread sleep failed on reconnection: "+e1);
 			}
 		}
+	}
+	
+	public void enquireLinkSend(){
+//		enquireLinkThread = new Thread(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+				while(true){
+					enquireLink();
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+//			}
+//		});
+		
+//		enquireLinkThread.setDaemon(true);
+//		enquireLinkThread.setName("enquireLink");
+//		enquireLinkThread.start();
 	}
 	
 	/**
@@ -432,7 +505,8 @@ public class SMPPConnection extends Thread  {
 	 */
 	private void loadProperties(String fileName) throws IOException {
 		System.out.println("Reading configuration file " + fileName + "...");
-		FileInputStream propsFile = new FileInputStream("../applications/sami/WEB-INF/classes/"+fileName);
+//		FileInputStream propsFile = new FileInputStream("../applications/sami/WEB-INF/classes/"+fileName);
+		FileInputStream propsFile = new FileInputStream(fileName);
 		properties.load(propsFile);
 		propsFile.close();
 		System.out.println("Setting default parameters...");
@@ -540,9 +614,5 @@ public class SMPPConnection extends Thread  {
 	}
 	
 	
-	@Override
-	public void destroy(){
-		unbind();
-	}
 	
 }
