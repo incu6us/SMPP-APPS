@@ -23,14 +23,13 @@ public class UploadMSISDNController {
 	
 	private static Logger LOGGER = Logger.getLogger(UploadMSISDNController.class);
 	
-	@RequestMapping(value = "/upload", method = RequestMethod.POST)
+	@RequestMapping(value = "/upload", method = RequestMethod.POST, headers="content-type=multipart/form-data")
 	public @ResponseBody ModelAndView postFile(
 			@RequestParam("file") MultipartFile file,
 			@RequestParam("text") String text, 
 			@RequestParam("name") String name,
 			Model model) {
 		
-//		String fileName = null;
 		if (!file.isEmpty()) {
 			try {
 				StringBuffer textFromFile = new StringBuffer();
@@ -50,27 +49,8 @@ public class UploadMSISDNController {
 				reader.close();
 				inputStream.close();
 				
-				System.out.println(textFromFile);
+				LOGGER.info("File upload successfuly!");
 				
-//				byte[] bytes = file.getBytes();
-//
-//				// Creating the directory to store file
-//				String rootPath = System.getProperty("catalina.home");
-//				
-//				File dir = new File(rootPath + File.separator + "tmpFiles");
-//				if (!dir.exists()) {
-//					dir.mkdirs();
-//				}
-//				
-//				// Create the file on server
-//				File serverFile = new File(dir.getAbsolutePath()
-//						+ File.separator + file.getOriginalFilename());
-//				BufferedOutputStream stream = new BufferedOutputStream(
-//						new FileOutputStream(serverFile));
-//				stream.write(bytes);
-//				stream.close();
-//
-//				LOGGER.info("Saved path: " + serverFile);
 				return new ModelAndView("redirect:/index/state?uploadState=success");
 			} catch (Exception e) {
 				System.out.println(e.getMessage());

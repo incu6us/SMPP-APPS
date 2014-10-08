@@ -57,7 +57,7 @@ public class IndexController {
 		model.addAttribute("pageName", "index");
 		model.addAttribute("uploadState", uploadState);
 		model.addAttribute("smppSettings", smppSettings.getActiveAccounts());
-
+		
 		return "index";
 	}
 

@@ -1,15 +1,20 @@
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-import ua.com.life.smpp.db.domain.SmppSettings;
-import ua.com.life.smpp.db.service.SmppManage;
-import ua.com.life.smpp.db.service.SmppManageImpl;
-import ua.com.life.smpp.sami.smpp.SMPPConnection;
+import ua.com.life.smpp.db.domain.Campaign;
+import ua.com.life.smpp.db.domain.MsisdnList;
+import ua.com.life.smpp.db.service.CampaignManage;
+import ua.com.life.smpp.db.service.MsisdnListManage;
+
+//import ua.com.life.smpp.db.domain.SmppSettings;
+//import ua.com.life.smpp.db.service.SmppManage;
+//import ua.com.life.smpp.db.service.SmppManageImpl;
+//import ua.com.life.smpp.sami.smpp.SMPPConnection;
 
 public class Main {
 
@@ -17,37 +22,37 @@ public class Main {
 
 		ApplicationContext ctx = new FileSystemXmlApplicationContext(
 				"src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml");
-
-		final SmppManage smppSettings = (SmppManage) ctx
-				.getBean("smppManageImpl");
-
-		String destAddress = "ervge";
-		String shortMessage = "test";
-		String sender = "2345";
-		byte senderTon = 0x05;
-		byte senderNpi = 0x00;
-
-		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
-			System.out.println(smpp.getName());
-		}
-		
-		
-		for (final SmppSettings smpp : smppSettings.getActiveAccounts()) {
-			Thread t = new Thread(new Runnable() {
-				SMPPConnection connection;
-
-				@Override
-				public void run() {
-					connection = new SMPPConnection(smpp);
-					connection.bind();
-					connection.enquireLinkSend();
-					System.out.println("--->Current thread: "+Thread.currentThread().getName());
-
-				}
-			});
-			t.setName(smpp.getSystemId());
-			t.start();
-		}
+//
+//		final SmppManage smppSettings = (SmppManage) ctx
+//				.getBean("smppManageImpl");
+//
+//		String destAddress = "ervge";
+//		String shortMessage = "test";
+//		String sender = "2345";
+//		byte senderTon = 0x05;
+//		byte senderNpi = 0x00;
+//
+//		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
+//			System.out.println(smpp.getName());
+//		}
+//		
+//		
+//		for (final SmppSettings smpp : smppSettings.getActiveAccounts()) {
+//			Thread t = new Thread(new Runnable() {
+//				SMPPConnection connection;
+//
+//				@Override
+//				public void run() {
+//					connection = new SMPPConnection(smpp);
+//					connection.bind();
+//					connection.enquireLinkSend();
+//					System.out.println("--->Current thread: "+Thread.currentThread().getName());
+//
+//				}
+//			});
+//			t.setName(smpp.getSystemId());
+//			t.start();
+//		}
 		
 //		Thread t = new Thread().getName().equals()
 		// Long id = smppSettings.getActiveAccount(new Long(2)).getId();
@@ -123,5 +128,36 @@ public class Main {
 		// SmppManage smppSettings = (SmppManage) ctx.getBean("smppManageImpl");
 		// smppSettings.deleteSmppAccountById(new Long(1));
 
+		
+		/*
+		 * Compaign add
+		 */
+		
+//		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+//		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+//		
+//		Campaign camp = new Campaign("Test Campaign 1");
+//
+//		MsisdnList msisdnRecord = new MsisdnList("380632105719", 0, camp);
+//		MsisdnList msisdnRecord1 = new MsisdnList("380937530213", 0, camp);
+//
+//		Set<MsisdnList> msisdnList = new HashSet<MsisdnList>();
+//		msisdnList.add(msisdnRecord);
+//		msisdnList.add(msisdnRecord1);
+//		
+//		campaign.save(camp);
+//		msisdn.save(msisdnList);
+		
+		
+		/*
+		 * Campaign show all
+		 */
+		
+		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+
+		for(MsisdnList msisdnObj : msisdn.getAllMsisdnList()){
+			System.out.println(msisdnObj.getId());
+		}
 	}
 }
