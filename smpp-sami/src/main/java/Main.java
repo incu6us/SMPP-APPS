@@ -8,8 +8,10 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import ua.com.life.smpp.db.domain.Campaign;
 import ua.com.life.smpp.db.domain.MsisdnList;
+import ua.com.life.smpp.db.domain.TextForCampaign;
 import ua.com.life.smpp.db.service.CampaignManage;
 import ua.com.life.smpp.db.service.MsisdnListManage;
+import ua.com.life.smpp.db.service.TextForCampaignManage;
 
 //import ua.com.life.smpp.db.domain.SmppSettings;
 //import ua.com.life.smpp.db.service.SmppManage;
@@ -133,31 +135,35 @@ public class Main {
 		 * Compaign add
 		 */
 		
-//		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
-//		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
-//		
-//		Campaign camp = new Campaign("Test Campaign 1");
-//
-//		MsisdnList msisdnRecord = new MsisdnList("380632105719", 0, camp);
-//		MsisdnList msisdnRecord1 = new MsisdnList("380937530213", 0, camp);
-//
-//		Set<MsisdnList> msisdnList = new HashSet<MsisdnList>();
-//		msisdnList.add(msisdnRecord);
-//		msisdnList.add(msisdnRecord1);
-//		
-//		campaign.save(camp);
-//		msisdn.save(msisdnList);
+		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+		TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
+		
+		Campaign camp = new Campaign("Test Campaign 1");
+
+		MsisdnList msisdnRecord = new MsisdnList("380632105719", 0, camp);
+		MsisdnList msisdnRecord1 = new MsisdnList("380937530213", 0, camp);
+		
+		TextForCampaign campText = new TextForCampaign("hren kakaja-to...", camp);
+
+		Set<MsisdnList> msisdnList = new HashSet<MsisdnList>();
+		msisdnList.add(msisdnRecord);
+		msisdnList.add(msisdnRecord1);
+		
+		campaign.save(camp);
+		text.save(campText);
+		msisdn.save(msisdnList);
 		
 		
 		/*
 		 * Campaign show all
 		 */
 		
-		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
-		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
-
-		for(MsisdnList msisdnObj : msisdn.getAllMsisdnList()){
-			System.out.println(msisdnObj.getId());
-		}
+//		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+//		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+//
+//		for(MsisdnList msisdnObj : msisdn.getAllMsisdnList()){
+//			System.out.println(msisdnObj.getId());
+//		}
 	}
 }

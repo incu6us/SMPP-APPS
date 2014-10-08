@@ -81,6 +81,7 @@
 				<value>ua.com.life.smpp.db.domain.SmppSettings</value>
 				<value>ua.com.life.smpp.db.domain.MsisdnList</value>
 				<value>ua.com.life.smpp.db.domain.Campaign</value>
+				<value>ua.com.life.smpp.db.domain.TextForCampaign</value>
 			</list>
 		</property>
 	</bean>
