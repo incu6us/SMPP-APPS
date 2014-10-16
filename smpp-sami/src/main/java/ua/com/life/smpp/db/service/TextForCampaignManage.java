@@ -6,7 +6,8 @@ import ua.com.life.smpp.db.domain.TextForCampaign;
 
 public interface TextForCampaignManage {
 	public TextForCampaign getTextForCampaignById(Long id);
-	public TextForCampaign getTextForCampaignByName(String campaignName);
+	public TextForCampaign getTextForCampaignByCompaignId(Long campaignId);
+	public TextForCampaign getTextForCampaignByCompaignName(String campaignName);
 	public List<TextForCampaign> getAllTexts();
 	public void save(TextForCampaign compaignText);	
 }

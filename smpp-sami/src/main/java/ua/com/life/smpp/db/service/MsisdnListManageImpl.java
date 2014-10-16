@@ -1,5 +1,6 @@
 package ua.com.life.smpp.db.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +32,21 @@ public class MsisdnListManageImpl implements MsisdnListManage {
 		for(MsisdnList msisdn : msisdnList){
 			msisdnListDao.save(msisdn);
 		}
+	}
+
+	@Transactional
+	public List<MsisdnList> getByMsisdnByStatus(Integer status) {
+		return msisdnListDao.getByMsisdnByStatus(status);
+	}
+
+	@Transactional
+	public List<MsisdnList> getByMsisdnByStatus(Integer status, int limit) {
+		return msisdnListDao.getByMsisdnByStatus(status, limit);
+	}
+
+	@Transactional
+	public void sendToSmsC(Long msisdnId, String messageId) {
+		msisdnListDao.sendToSmsC(msisdnId, messageId);
 	}
 
 }

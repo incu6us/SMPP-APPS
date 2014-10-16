@@ -21,9 +21,12 @@ public class TextForCampaign {
 	private String text;
 	
 	@ManyToOne
-	@JoinColumn(name="camapign_id")
+	@JoinColumn(name="campaign_id")
 	private Campaign campaign;
 
+	public TextForCampaign(){
+	}
+	
 	public TextForCampaign(String text) {
 		this.text = text;
 	}

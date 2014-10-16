@@ -20,11 +20,14 @@ public class Campaign {
 
 	@Id
 	@GeneratedValue
-	@Column(name="camapign_id")
-	private Long camaignId;
+	@Column(name="campaign_id")
+	private Long campaignId;
 	
 	@Column(name="name",length=80, unique=true)
 	private String name;
+	
+	@Column(name="source_addr", length=20)
+	private String sourceAddr;
 	
 	@OneToMany(mappedBy="campaign")
 	private Set<MsisdnList> msisdnList;
@@ -33,22 +36,24 @@ public class Campaign {
 	public Campaign() {
 	}
 
-	public Campaign(String name) {
+	public Campaign(String name, String sourceAddr) {
 		this.name = name;
+		this.sourceAddr = sourceAddr;
 	}
 
-	public Campaign(String name, Set<MsisdnList> msisdList){
+	public Campaign(String name, String sourceAddr, Set<MsisdnList> msisdList){
 		this.name = name;
+		this.sourceAddr = sourceAddr;
 		this.msisdnList = msisdList;
 	}
 	
 
-	public Long getCamaignId() {
-		return camaignId;
+	public Long getCampaignId() {
+		return campaignId;
 	}
 
-	public void setCamaignId(Long camaignId) {
-		this.camaignId = camaignId;
+	public void setCampaignId(Long campaignId) {
+		this.campaignId = campaignId;
 	}
 
 	public String getName() {
@@ -57,6 +62,14 @@ public class Campaign {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getSourceAddr() {
+		return sourceAddr;
+	}
+
+	public void setSourceAddr(String sourceAddr) {
+		this.sourceAddr = sourceAddr;
 	}
 
 	public Set<MsisdnList> getMsisdnList() {

@@ -3,14 +3,13 @@ package ua.com.life.smpp.sami.smpp;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.smpp.Data;
-import org.smpp.ServerPDUEvent;
 import org.smpp.ServerPDUEventListener;
 import org.smpp.Session;
-import org.smpp.SmppObject;
 import org.smpp.TCPIPConnection;
 import org.smpp.TimeoutException;
 import org.smpp.WrongSessionStateException;
@@ -19,29 +18,44 @@ import org.smpp.pdu.AddressRange;
 import org.smpp.pdu.BindRequest;
 import org.smpp.pdu.BindResponse;
 import org.smpp.pdu.BindTransciever;
-import org.smpp.pdu.BindTransmitter;
-import org.smpp.pdu.DeliverSM;
-import org.smpp.pdu.DeliverSMResp;
 import org.smpp.pdu.EnquireLink;
 import org.smpp.pdu.EnquireLinkResp;
-import org.smpp.pdu.PDU;
 import org.smpp.pdu.PDUException;
 import org.smpp.pdu.SubmitSM;
 import org.smpp.pdu.SubmitSMResp;
 import org.smpp.pdu.Unbind;
 import org.smpp.pdu.UnbindResp;
-import org.smpp.pdu.ValueNotSetException;
 import org.smpp.pdu.WrongLengthOfStringException;
-import org.smpp.util.ByteBuffer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import ch.qos.logback.core.joran.action.NewRuleAction;
+import ua.com.life.smpp.db.domain.MsisdnList;
 import ua.com.life.smpp.db.domain.SmppSettings;
+import ua.com.life.smpp.db.service.CampaignManage;
+import ua.com.life.smpp.db.service.MsisdnListManage;
 import ua.com.life.smpp.db.service.SmppManage;
+import ua.com.life.smpp.db.service.TextForCampaignManage;
 
-public class SMPPConnection  {
+public class SmppConnection {
 	
-	private static Logger LOGGER = Logger.getLogger(SMPPConnection.class);
+//	@Autowired
+//	private SmppManage smppSettings;
+//	
+//	@Autowired
+//	private CampaignManage campaign;
+//	
+//	@Autowired
+//	private MsisdnListManage msisdn;
+//	
+//	@Autowired
+//	private TextForCampaignManage text;
+
+	private static Logger LOGGER = Logger.getLogger(SmppConnection.class);
 
 	/**
 	 * File with default settings for the application.
@@ -60,8 +74,8 @@ public class SMPPConnection  {
 	/**
 	 * This is the SMPP session used for communication with SMSC.
 	 */
-	static Session session = null;
-	
+	private Session session = null;
+	private PDUListner pduListener;
 	private PDUReceiver pduReceiver;
 	private Thread enquireLinkThread;
 	
@@ -136,9 +150,7 @@ public class SMPPConnection  {
 	 * @throws IOException 
 	 */
 
-	
-	
-	public SMPPConnection(String sessName, String systemId, String password, String ipAddress, int port) {
+	public SmppConnection(String sessName, String systemId, String password, String ipAddress, int port) {
 		this.sessName = sessName;
 		this.systemId = systemId;
 		this.password = password;
@@ -163,7 +175,10 @@ public class SMPPConnection  {
 		return bound;
 	}
 	
-	public SMPPConnection(SmppSettings settings) {
+	public String getIpAddr(){
+		return ipAddress;
+	}
+	public SmppConnection(SmppSettings settings) {
 		this.sessName = settings.getName();
 		this.systemId = settings.getSystemId();
 		this.password = settings.getPassword();
@@ -178,6 +193,7 @@ public class SMPPConnection  {
 		}
 //		setDaemon(true);
 //		start();
+
 	}
 
 	/**
@@ -206,7 +222,7 @@ public class SMPPConnection  {
 	 * @see Session#bind(BindRequest,ServerPDUEventListener)
 	 */
 
-	public synchronized void bind() {
+	public void bind() {
 			try{
 				if (isBound()) {
 					System.out.println("Already bound (" + this.sessName + "), unbind first.");
@@ -223,6 +239,7 @@ public class SMPPConnection  {
 				TCPIPConnection connection = new TCPIPConnection(ipAddress, port);
 	//			connection.setReceiveTimeout(20 * 1000);
 				session = new Session(connection);
+				pduListener = new PDUListner(session);
 				// set values
 				request.setSystemId(systemId);
 				request.setPassword(password);
@@ -231,53 +248,35 @@ public class SMPPConnection  {
 				request.setAddressRange(addressRange);
 				// send the request
 				System.out.println("Bind request " + request.debugString());
-				response = session.bind(request);
+				response = session.bind(request, pduListener);
 	
 				Thread.sleep(1000);
 				
-				pduReceiver = new PDUReceiver(session);
-				pduReceiver.start();
-				
-				Thread.sleep(1000);
-				
-				enquireLinkThread = new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						while(true){
-							enquireLink();
-							try {
-								Thread.sleep(5000);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						}
-					}
-				});
-				
-//				enquireLinkThread.setDaemon(true);
-//				enquireLinkThread.setName("enquireLink");
-				enquireLinkThread.start();
-				
 				System.out.println("Bind response " + response.debugString());
 				if (response.getCommandStatus() == Data.ESME_ROK) {
-//					bound = true;
 					setBound(true);
 				} else {
 					System.out.println("Bind failed for " + this.sessName + ", code "
 							+ response.getCommandStatus());
+					while (!isBound()){
+						bind();
+						Thread.sleep(5000);
+					}
 				}
+
+				
 			} catch (Exception e) {
 				System.out.println("Bind operation failed. " + e);
 				LOGGER.error("Bind operation failed. "+ this.sessName + ": " + e);
-				
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				while(!isBound()){
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					bind();
 				}
-				bind();
 			}
 	}
 
@@ -353,8 +352,9 @@ public class SMPPConnection  {
 	 * @see SubmitSM
 	 * @see SubmitSMResp
 	 */
-	public void submit(String destAddress, String shortMessage, String sender,
-			byte senderTon, byte senderNpi) {
+	public void submit(String destAddress, String shortMessage, String sender) {
+		byte senderTon = 0;
+		byte senderNpi = 0;
 		
 		bind();
 		
@@ -364,14 +364,13 @@ public class SMPPConnection  {
 			// set values
 			request.setServiceType(serviceType);
 			if (sender != null) {
-				if (sender.startsWith("+")) {
-					sender = sender.substring(1);
-					senderTon = 1;
-					senderNpi = 1;
-				}
-				if (!sender.matches("\\d+")) {
+				if(sender.matches("\\d+")){
 					senderTon = 5;
 					senderNpi = 0;
+				}
+				if (!sender.matches("\\d+")) {
+					senderTon = 1;
+					senderNpi = 1;
 				}
 				if (senderTon == 5) {
 					request.setSourceAddr(new Address(senderTon, senderNpi,
@@ -388,7 +387,7 @@ public class SMPPConnection  {
 			}
 			request.setDestAddr(new Address((byte) 1, (byte) 1, destAddress));
 			request.setReplaceIfPresentFlag(replaceIfPresentFlag);
-			request.setShortMessage(shortMessage, Data.ENC_GSM7BIT);
+//			request.setShortMessage(shortMessage, Data.ENC_GSM7BIT);
 			request.setScheduleDeliveryTime(scheduleDeliveryTime);
 			request.setValidityPeriod(validityPeriod);
 			request.setEsmClass(esmClass);
@@ -420,7 +419,7 @@ public class SMPPConnection  {
 					e1.printStackTrace();
 				}
 			}
-			submit(destAddress, shortMessage, sender, senderTon, senderNpi);
+//			submit(destAddress, shortMessage, sender);
 		}
 	}
 
@@ -435,70 +434,6 @@ public class SMPPConnection  {
 	 * @see EnquireLink
 	 * @see EnquireLinkResp
 	 */
-	public void enquireLink() {
-		try {
-			EnquireLink request = new EnquireLink();
-			EnquireLinkResp response;
-			System.out.println(sessName+": Enquire Link request " + request.debugString());
-			LOGGER.debug(sessName+": Enquire Link request " + request.debugString());
-			
-			response = session.enquireLink(request);
-			System.out.println(sessName+": Enquire Link response "
-					+ response.debugString());
-			LOGGER.debug(sessName+": Enquire Link response "
-					+ response.debugString());
-		} catch (Exception e) {
-			System.out.println(sessName+": Enquire Link operation failed. " + e);
-			LOGGER.warn(sessName+": Enquire Link operation failed. " + e + "\n\rRebinding for system_id: " + systemId + "...");
-			
-			try{
-				unbind();
-			}catch(Exception e1){
-				e1.printStackTrace();
-			}
-			
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e1) {
-				LOGGER.warn(sessName+": Thread sleep failed on reconnection: "+e1);
-				System.out.println(sessName+": Thread sleep failed on reconnection: "+e1);
-			}
-			
-			try{
-				bind();
-			}catch(Exception e1){
-				e1.printStackTrace();
-			}
-			
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e1) {
-				LOGGER.warn(sessName+": Thread sleep failed on reconnection: "+e1);
-			}
-		}
-	}
-	
-	public void enquireLinkSend(){
-//		enquireLinkThread = new Thread(new Runnable() {
-//			
-//			@Override
-//			public void run() {
-				while(true){
-					enquireLink();
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-//			}
-//		});
-		
-//		enquireLinkThread.setDaemon(true);
-//		enquireLinkThread.setName("enquireLink");
-//		enquireLinkThread.start();
-	}
-	
 	/**
 	 * Loads configuration parameters from the file with the given name. Sets
 	 * private variable to the loaded values.
@@ -611,6 +546,80 @@ public class SMPPConnection  {
 			LOGGER.error("The length of " + descr
 					+ " parameter is wrong.");
 		}
+	}
+
+	
+	public void run() {
+		Runnable run = new Runnable() {
+			ApplicationContext ctx = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/manual-context.xml");
+			
+			CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+			MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+			TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+
+				bind();
+				while (true) {
+					try {
+						Thread.sleep(1000);
+						try {
+							session.enquireLink();
+							System.out.println("enquirelink: " + sessName + " " + session);
+						} catch (TimeoutException | PDUException | WrongSessionStateException | IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							unbind();
+							while (!isBound()) {
+								bind();
+								try {
+									Thread.sleep(5000);
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+							}
+
+						}
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					Long msisdnOrigId = null;
+					String msisdnOrigNum = null;
+					String message = null;
+					String sourceAddr = null;
+					
+					while(true){
+						List<MsisdnList> msisdnList = msisdn.getByMsisdnByStatus(0, 1);
+						for(MsisdnList num : msisdnList){
+							msisdnOrigId = num.getId();
+							msisdnOrigNum = num.getMsisdn();
+							message = text.getTextForCampaignByCompaignId(num.getCampaign().getCampaignId()).getText();
+							sourceAddr = num.getCampaign().getSourceAddr();
+							
+							System.out.println("Sysid:");
+							submit(msisdnOrigNum, message, sourceAddr);
+							msisdn.sendToSmsC(msisdnOrigId, "lrknmwerf123");
+						}
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		};
+		
+		Thread t = new Thread(run);
+		t.setName(sessName);
+		t.start();
+
 	}
 	
 	

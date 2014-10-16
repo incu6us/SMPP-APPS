@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,79 +13,30 @@ import ua.com.life.smpp.db.domain.TextForCampaign;
 import ua.com.life.smpp.db.service.CampaignManage;
 import ua.com.life.smpp.db.service.MsisdnListManage;
 import ua.com.life.smpp.db.service.TextForCampaignManage;
-
-//import ua.com.life.smpp.db.domain.SmppSettings;
-//import ua.com.life.smpp.db.service.SmppManage;
-//import ua.com.life.smpp.db.service.SmppManageImpl;
-//import ua.com.life.smpp.sami.smpp.SMPPConnection;
+import ua.com.life.smpp.db.domain.SmppSettings;
+import ua.com.life.smpp.db.service.SmppManage;
+import ua.com.life.smpp.db.service.SmppManageImpl;
+import ua.com.life.smpp.sami.smpp.SmppConnection;
 
 public class Main {
 
+	private static SmppConnection connection;
+	
 	public static void main(String[] args) throws Exception {
 
 		ApplicationContext ctx = new FileSystemXmlApplicationContext(
-				"src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml");
-//
-//		final SmppManage smppSettings = (SmppManage) ctx
-//				.getBean("smppManageImpl");
-//
-//		String destAddress = "ervge";
-//		String shortMessage = "test";
-//		String sender = "2345";
-//		byte senderTon = 0x05;
-//		byte senderNpi = 0x00;
-//
+				"src/main/webapp/WEB-INF/manual-context.xml");
+		
+//		SmppManage smppSettings = (SmppManage) ctx.getBean("smppManageImpl");
+
 //		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
-//			System.out.println(smpp.getName());
-//		}
-//		
-//		
-//		for (final SmppSettings smpp : smppSettings.getActiveAccounts()) {
-//			Thread t = new Thread(new Runnable() {
-//				SMPPConnection connection;
+//			System.out.println("---- Started sysid: " + smpp.getName());
 //
-//				@Override
-//				public void run() {
-//					connection = new SMPPConnection(smpp);
-//					connection.bind();
-//					connection.enquireLinkSend();
-//					System.out.println("--->Current thread: "+Thread.currentThread().getName());
-//
-//				}
-//			});
-//			t.setName(smpp.getSystemId());
-//			t.start();
+////			connection = new SmppConnection(smpp);
+////			Thread bind = new Thread(connection);
+////			bind.start();
 //		}
 		
-//		Thread t = new Thread().getName().equals()
-		// Long id = smppSettings.getActiveAccount(new Long(2)).getId();
-		// System.out.println("account id: "+id);
-		// String sessName = smppSettings.getActiveAccount(new
-		// Long(2)).getName();
-		// String systemId = smppSettings.getActiveAccount(new
-		// Long(2)).getSystemId();
-		// String password = smppSettings.getActiveAccount(new
-		// Long(2)).getPassword();
-		// String ipAddress = smppSettings.getActiveAccount(new
-		// Long(2)).getHost();
-		// int port = smppSettings.getActiveAccount(new Long(2)).getPort();
-		//
-		//
-		// final SMPPConnection smpp = new SMPPConnection(sessName, systemId,
-		// password, ipAddress, port);
-		//
-		// smpp.bind();
-		// System.out.println("1-----------------");
-		// Thread.sleep(2000);
-		//
-		// for(int i = 0; i<100; i++){
-		// smpp.submit(destAddress, shortMessage+" - "+i, sender, senderTon,
-		// senderNpi);
-		// System.out.println("2-----------------");
-		// }
-
-		// Thread.sleep(5000);
-		// smpp.unbind();
 		/*
 		 * add settings
 		 */
@@ -135,35 +87,65 @@ public class Main {
 		 * Compaign add
 		 */
 		
-		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
-		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
-		TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
-		
-		Campaign camp = new Campaign("Test Campaign 1");
-
-		MsisdnList msisdnRecord = new MsisdnList("380632105719", 0, camp);
-		MsisdnList msisdnRecord1 = new MsisdnList("380937530213", 0, camp);
-		
-		TextForCampaign campText = new TextForCampaign("hren kakaja-to...", camp);
-
-		Set<MsisdnList> msisdnList = new HashSet<MsisdnList>();
-		msisdnList.add(msisdnRecord);
-		msisdnList.add(msisdnRecord1);
-		
-		campaign.save(camp);
-		text.save(campText);
-		msisdn.save(msisdnList);
+//		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+//		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+//		TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
+//		
+//		Campaign camp = new Campaign("Test Campaign 1", "test-src");
+//		System.out.println("----------------");
+//		MsisdnList msisdnRecord = new MsisdnList("380632105719", camp);
+//		MsisdnList msisdnRecord1 = new MsisdnList("380937530213", camp);
+//		
+//		TextForCampaign campText = new TextForCampaign("hren kakaja-to...", camp);
+//
+//		Set<MsisdnList> msisdnList = new HashSet<MsisdnList>();
+//		msisdnList.add(msisdnRecord);
+//		msisdnList.add(msisdnRecord1);
+//		
+//		campaign.save(camp);
+//		text.save(campText);
+//		msisdn.save(msisdnList);
 		
 		
 		/*
 		 * Campaign show all
 		 */
 		
-//		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
-//		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
-//
-//		for(MsisdnList msisdnObj : msisdn.getAllMsisdnList()){
-//			System.out.println(msisdnObj.getId());
+		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+		TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
+		
+		for(MsisdnList msisdnObj : msisdn.getByMsisdnByStatus(0)){
+			System.out.println(msisdnObj.getMsisdn()+" "+msisdnObj.getCampaign().getCampaignId());
+			System.out.println(text.getTextForCampaignByCompaignId(msisdnObj.getCampaign().getCampaignId()).getText());
+			msisdn.sendToSmsC(msisdnObj.getId(), "3249875298345");
+		}
+		
+//		List<MsisdnList> msisdnList = msisdn.getByMsisdnByStatus(0, 3);
+//		
+//		for (MsisdnList msisdnObj : msisdnList.subList(0, 1)){
+//			System.out.println(msisdnObj.getMsisdn()+" "+msisdnObj.getCampaign().getCampaignId());
 //		}
+		
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

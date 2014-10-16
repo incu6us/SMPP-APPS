@@ -16,6 +16,9 @@ import org.smpp.pdu.PDU;
 import org.smpp.pdu.PDUException;
 import org.smpp.pdu.ValueNotSetException;
 
+import com.mysql.fabric.Response;
+import com.sun.research.ws.wadl.Request;
+
 public class PDUReceiver extends Thread {
 
 	private static Logger LOGGER = Logger.getLogger(PDUReceiver.class);
@@ -36,8 +39,10 @@ public class PDUReceiver extends Thread {
 		while (true) {
 			PDU pdu = receive();
 			if (pdu != null) {
+//			if(pdu.isValid() && pdu.isRequest() && pdu != null){
 				System.out.println(pdu.getClass().getName());
 				System.out.println("PDU debug: " + pdu.debugString());
+				
 				if (pdu instanceof DeliverSM) {
 					System.out.println("DeliverSM");
 					System.out.println("Command status = "
@@ -80,8 +85,6 @@ public class PDUReceiver extends Thread {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-//					EnquireLinkResp enqLinkResp = (EnquireLinkResp) pdu;
-//					enqLinkResp.setSequenceNumber(enqLink.getSequenceNumber());
 				}
 				
 //				else {

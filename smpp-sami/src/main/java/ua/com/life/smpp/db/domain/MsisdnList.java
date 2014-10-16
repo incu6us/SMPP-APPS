@@ -30,7 +30,7 @@ public class MsisdnList {
 	@Column(name="reading_date")
 	private Date readingDate;
 	
-	@Column(length=5)
+	@Column(length=5, nullable=false)
 	private Integer status;
 	
 	@Column(name="message_id", length=40)
@@ -38,7 +38,7 @@ public class MsisdnList {
 	
 	
 	@ManyToOne
-	@JoinColumn(name="camapign_id")
+	@JoinColumn(name="campaign_id")
 	private Campaign campaign;
 	
 
@@ -51,6 +51,13 @@ public class MsisdnList {
 		this.status = status;
 	}
 
+	public MsisdnList(String msisdn, Campaign camaign) {
+		this.msisdn = msisdn;
+		this.sendingDate = new Date(System.currentTimeMillis());
+		this.status = 0;
+		this.campaign = camaign;
+	}
+	
 	public MsisdnList(String msisdn,  Integer status, Campaign camaign) {
 		this.msisdn = msisdn;
 		this.sendingDate = new Date(System.currentTimeMillis());

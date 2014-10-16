@@ -27,7 +27,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ua.com.life.sami.init.SmppConnectionInit;
 import ua.com.life.smpp.db.domain.SmppSettings;
 import ua.com.life.smpp.db.service.SmppManage;
-import ua.com.life.smpp.sami.smpp.SMPPConnection;
+import ua.com.life.smpp.sami.smpp.SmppConnection;
 
 @Controller
 @RequestMapping(value = { "/", "/index" })
@@ -38,7 +38,7 @@ public class IndexController {
 	@Autowired
 	private SmppManage smppSettings;
 	
-	private SMPPConnection connection;
+	private SmppConnection connection;
 	
 	
 	@RequestMapping(method = RequestMethod.GET)

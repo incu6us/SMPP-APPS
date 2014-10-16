@@ -1,65 +1,68 @@
 package ua.com.life.sami.init;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.faces.context.FacesContext;
+import javax.faces.render.ResponseStateManager;
 import javax.inject.Singleton;
-import javax.persistence.PostLoad;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import ua.com.life.smpp.db.domain.MsisdnList;
 import ua.com.life.smpp.db.domain.SmppSettings;
+import ua.com.life.smpp.db.service.CampaignManage;
+import ua.com.life.smpp.db.service.CampaignManageImpl;
+import ua.com.life.smpp.db.service.MsisdnListManage;
+import ua.com.life.smpp.db.service.MsisdnListManageImpl;
 import ua.com.life.smpp.db.service.SmppManage;
-import ua.com.life.smpp.sami.smpp.SMPPConnection;
+import ua.com.life.smpp.db.service.TextForCampaignManage;
+import ua.com.life.smpp.db.service.TextForCampaignManageImpl;
+import ua.com.life.smpp.sami.smpp.SmppConnection;
 
-@Singleton
 public class SmppConnectionInit {
 
 	@Autowired
 	private SmppManage smppSettings;
 
-	private SMPPConnection connection;
+	@Autowired
+	private CampaignManage campaign;
+
+	@Autowired
+	private MsisdnListManage msisdn;
+
+	@Autowired
+	private TextForCampaignManage text;
+	
+	private Set<SmppConnection> connection = new HashSet<SmppConnection>();
+	private Thread bind;
+	private ExecutorService execService;
+
 
 	@PostConstruct
-	public void init() {
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		for (final SmppSettings smpp : smppSettings.getActiveAccounts()) {
-			System.out.println(smpp.getName());
-			Thread conn = new Thread(new Runnable() {
+	public void init() throws InterruptedException {
 
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					connection = new SMPPConnection(smpp);
-					connection.bind();
-				}
-			});
-//			conn.setDaemon(true);
-			conn.setName(smpp.getSystemId());
-			conn.start();
+		Thread.sleep(1000);
+		
+		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
+			System.out.println("---- Started sysid: " + smpp.getName());
+
+			connection.add(new SmppConnection(smpp));
+		}
+
+		for(SmppConnection conn : connection){
+			conn.run();
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	@PreDestroy
-	public void destroy() {
-//		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-//		Iterator<Thread> i = threadSet.iterator();
-//		
-//		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
-//			while (i.hasNext()) {
-//				Thread t = i.next();
-//				if(t.getName().equals(smpp.getSystemId())){
-//					t.destroy();
-//				}
-//			}
-//		}
-	}
 }

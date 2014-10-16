@@ -22,8 +22,13 @@ public class TextForCampaignManageImpl implements TextForCampaignManage {
 	}
 
 	@Override
-	public TextForCampaign getTextForCampaignByName(String campaignName) {
-		return text.getTextForCampaignByName(campaignName);
+	public TextForCampaign getTextForCampaignByCompaignId(Long campaignId) {
+		return text.getTextForCampaignByCompaignId(campaignId);
+	}
+
+	@Override
+	public TextForCampaign getTextForCampaignByCompaignName(String campaignName) {
+		return text.getTextForCampaignByCompaignName(campaignName);
 	}
 
 	@Override
@@ -35,5 +40,6 @@ public class TextForCampaignManageImpl implements TextForCampaignManage {
 	public void save(TextForCampaign compaignText) {
 		text.save(compaignText);
 	}
+
 
 }

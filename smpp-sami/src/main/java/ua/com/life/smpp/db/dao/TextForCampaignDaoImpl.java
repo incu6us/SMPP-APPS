@@ -2,7 +2,10 @@ package ua.com.life.smpp.db.dao;
 
 import java.util.List;
 
+import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Expression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -20,7 +23,14 @@ public class TextForCampaignDaoImpl implements TextForCampaignDao {
 	}
 
 	@Override
-	public TextForCampaign getTextForCampaignByName(String campaignName) {
+	public TextForCampaign getTextForCampaignByCompaignId(Long campaignId) {
+		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from TextForCampaign where campaign = :campaign");
+		q.setLong("campaign", campaignId);
+		return (TextForCampaign) q.uniqueResult();
+	}
+
+	@Override
+	public TextForCampaign getTextForCampaignByCompaignName(String campaignName) {
 		return (TextForCampaign) sessionFactory.getCurrentSession().get(TextForCampaign.class, campaignName);
 	}
 
@@ -33,5 +43,6 @@ public class TextForCampaignDaoImpl implements TextForCampaignDao {
 	public void save(TextForCampaign compaignText) {
 		sessionFactory.getCurrentSession().save(compaignText);
 	}
+
 
 }

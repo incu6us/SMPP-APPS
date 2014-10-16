@@ -13,29 +13,7 @@
 
 	<mvc:annotation-driven />
 	<mvc:resources mapping="/static/**" location="/static/" />
-	<context:component-scan base-package="ua.com.life.ui.controller" />
 
-	<bean
-		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="prefix">
-			<value>/WEB-INF/view/</value>
-		</property>
-		<property name="suffix">
-			<value>.jsp</value>
-		</property>
-	</bean>
-
-	 <bean id="multipartResolver"
-        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <!-- max upload size in bytes -->
-        <property name="maxUploadSize" value="20971520" /> <!-- 20MB -->
-    </bean>
-    
-	<bean id="messageSource"
-		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-		<property name="basename" value="WEB-INF/message.properties" />
-		<property name="defaultEncoding" value="UTF-8" />
-	</bean>
 
 	<!-- <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />-->
 	<bean name="smppConnectionInit" class="ua.com.life.sami.init.SmppConnectionInit" />
@@ -45,7 +23,8 @@
 	<context:component-scan base-package="ua.com.life.smpp.db.dao"></context:component-scan>
 	<context:component-scan base-package="ua.com.life.smpp.db.domain"></context:component-scan>
 	<context:component-scan base-package="ua.com.life.smpp.db.service"></context:component-scan>
-
+	<context:component-scan base-package="ua.com.life.ui.controller"></context:component-scan>
+	
 	<!-- Configure JDBC Connection -->
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
