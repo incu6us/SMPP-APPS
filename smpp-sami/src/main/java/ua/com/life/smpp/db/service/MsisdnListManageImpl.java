@@ -45,8 +45,13 @@ public class MsisdnListManageImpl implements MsisdnListManage {
 	}
 
 	@Transactional
-	public void sendToSmsC(Long msisdnId, String messageId) {
-		msisdnListDao.sendToSmsC(msisdnId, messageId);
+	public void sendToSmsC(Long msisdnId) {
+		msisdnListDao.sendToSmsC(msisdnId);
+	}
+
+	@Transactional
+	public void sendToSmsC(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err) {
+		msisdnListDao.sendToSmsC(msisdn, messageId, submitDate, doneDate, status, err);
 	}
 
 }

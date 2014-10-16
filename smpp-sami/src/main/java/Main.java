@@ -118,7 +118,7 @@ public class Main {
 		for(MsisdnList msisdnObj : msisdn.getByMsisdnByStatus(0)){
 			System.out.println(msisdnObj.getMsisdn()+" "+msisdnObj.getCampaign().getCampaignId());
 			System.out.println(text.getTextForCampaignByCompaignId(msisdnObj.getCampaign().getCampaignId()).getText());
-			msisdn.sendToSmsC(msisdnObj.getId(), "3249875298345");
+			msisdn.sendToSmsC(msisdnObj.getId());
 		}
 		
 //		List<MsisdnList> msisdnList = msisdn.getByMsisdnByStatus(0, 3);

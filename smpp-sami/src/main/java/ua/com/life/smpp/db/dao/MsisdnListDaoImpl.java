@@ -49,11 +49,26 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	}
 
 	@Override
-	public void sendToSmsC(Long msisdnId, String messageId) {
+	public void sendToSmsC(Long msisdnId) {
 		MsisdnList msisdn = (MsisdnList) sessionFactory.getCurrentSession().get(MsisdnList.class, msisdnId);
-		msisdn.setDeliveryDateSMSC(new Date());
+//		msisdn.setDeliveryDateSMSC(new Date());
 		msisdn.setStatus(1);
-		msisdn.setMessageId(messageId);
+	}
+	
+	@Override
+	public void sendToSmsC(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err) {
+		Query q = sessionFactory.getCurrentSession().createQuery("from MsidnList where msisdn = :msisdn and status=1");
+		q.setString("msisdn", msisdn);
+		
+		List<MsisdnList> msisdns = (List<MsisdnList>) q.list();
+		
+		for(MsisdnList m : msisdns){
+			m.setDeliveryDateSMSC(submitDate);
+			m.setReadingDate(doneDate);
+			m.setStatus(status);
+			m.setMessageId(messageId);
+			m.setSmscErr(err);
+		}
 	}
 	
 }

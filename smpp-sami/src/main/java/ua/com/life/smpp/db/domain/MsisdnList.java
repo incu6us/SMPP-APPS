@@ -21,13 +21,13 @@ public class MsisdnList {
 	@Column(length=15)
 	private String msisdn;
 	
-	@Column(name="sending_date")
+	@Column(name="accept_date")
 	private Date sendingDate;
 	
-	@Column(name="delitery_date_smsc")
+	@Column(name="submit_date")
 	private Date deliveryDateSMSC;
 	
-	@Column(name="reading_date")
+	@Column(name="done_date")
 	private Date readingDate;
 	
 	@Column(length=5, nullable=false)
@@ -35,6 +35,9 @@ public class MsisdnList {
 	
 	@Column(name="message_id", length=40)
 	private String messageId;
+	
+	@Column(name="smsc_err", length=5)
+	private String smscErr;
 	
 	
 	@ManyToOne
@@ -119,6 +122,14 @@ public class MsisdnList {
 
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
+	}
+
+	public String getSmscErr() {
+		return smscErr;
+	}
+
+	public void setSmscErr(String smscErr) {
+		this.smscErr = smscErr;
 	}
 
 	public Campaign getCampaign() {
