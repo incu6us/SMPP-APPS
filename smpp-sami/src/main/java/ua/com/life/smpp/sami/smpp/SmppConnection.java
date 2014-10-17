@@ -585,7 +585,7 @@ public class SmppConnection {
 						
 						// Sending messages
 						for (MsisdnList num : msisdnList) {
-							msisdn.sendToSmsC(num.getId()); 
+							msisdn.sentToSmsC(num.getId()); 
 
 							msisdnOrigId = num.getId();
 							msisdnOrigNum = num.getMsisdn();

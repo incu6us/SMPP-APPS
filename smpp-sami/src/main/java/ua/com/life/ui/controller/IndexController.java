@@ -30,15 +30,14 @@ import ua.com.life.smpp.db.service.SmppManage;
 import ua.com.life.smpp.sami.smpp.SmppConnection;
 
 @Controller
-@RequestMapping(value = { "/", "/index" })
+@RequestMapping(value = { "/", "/index"})
 public class IndexController {
-	
-	private static Logger LOGGER = Logger.getLogger(IndexController.class);
 
 	@Autowired
 	private SmppManage smppSettings;
 	
-	private SmppConnection connection;
+	private static Logger LOGGER = Logger.getLogger(IndexController.class);
+
 	
 	
 	@RequestMapping(method = RequestMethod.GET)

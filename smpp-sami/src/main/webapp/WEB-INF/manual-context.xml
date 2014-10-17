@@ -11,10 +11,6 @@
         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-	<mvc:annotation-driven />
-	<mvc:resources mapping="/static/**" location="/static/" />
-
-
 
 	<!-- This sescion tells Spring context where to look for bean classes with 
 		appropriate annotations -->

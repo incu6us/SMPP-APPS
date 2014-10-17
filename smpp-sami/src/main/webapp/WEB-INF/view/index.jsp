@@ -90,13 +90,16 @@
 		<form method="post" enctype="multipart/form-data" action='<c:url value="/upload" />'">
 			<table border="0">
 				<tr>
-					<td>Name:</td><td><input name="name" type="text" /></td>
+					<td>Campaign Name:</td><td><input name="campName" type="text" /></td>
+				</tr>
+				<tr>
+					<td>Source Address:</td><td><input name="sourceAddress" type="text" /></td>
 				</tr>
 				<tr>
 					<td>MSISDN File:</td><td> <input name="file" type="file" /> </td>
 				</tr>
 				<tr>
-					<td>Text:</td><td><textarea name="text" rows="20" cols="100"></textarea></td>
+					<td>Text:</td><td><textarea name="message" rows="20" cols="100"></textarea></td>
 				</tr>
 				<tr>
 					<td></td><td><button type="submit">Send</button></td>

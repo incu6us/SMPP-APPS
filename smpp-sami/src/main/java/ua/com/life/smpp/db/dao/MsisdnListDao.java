@@ -12,6 +12,6 @@ public interface MsisdnListDao {
 	public List<MsisdnList> getAllMsisdnList();
 	public void save(MsisdnList msisdn);
 	
-	public void sendToSmsC(Long msisdnId);
-	public void sendToSmsC(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err);
+	public void sentToSmsC(Long msisdnId);
+	public void sentToSmsC(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err);
 }
