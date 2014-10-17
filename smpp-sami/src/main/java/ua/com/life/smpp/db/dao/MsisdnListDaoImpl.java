@@ -35,29 +35,28 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	}
 
 	@Override
-	public List<MsisdnList> getByMsisdnByStatus(Integer status) {
+	public synchronized List<MsisdnList> getByMsisdnByStatus(Integer status) {
 		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList where status = :status");
 		q.setInteger("status", status);
 		return q.list();
 	}
 	
 	@Override
-	public List<MsisdnList> getByMsisdnByStatus(Integer status, int limit) {
+	public synchronized List<MsisdnList> getByMsisdnByStatus(Integer status, int limit) {
 		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList where status = :status").setMaxResults(limit);
 		q.setInteger("status", status);
 		return q.list();
 	}
 
 	@Override
-	public void sendToSmsC(Long msisdnId) {
+	public synchronized void sendToSmsC(Long msisdnId) {
 		MsisdnList msisdn = (MsisdnList) sessionFactory.getCurrentSession().get(MsisdnList.class, msisdnId);
-//		msisdn.setDeliveryDateSMSC(new Date());
 		msisdn.setStatus(1);
 	}
 	
 	@Override
 	public void sendToSmsC(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err) {
-		Query q = sessionFactory.getCurrentSession().createQuery("from MsidnList where msisdn = :msisdn and status=1");
+		Query q = sessionFactory.getCurrentSession().createQuery("from MsisdnList where msisdn = :msisdn and status=1");
 		q.setString("msisdn", msisdn);
 		
 		List<MsisdnList> msisdns = (List<MsisdnList>) q.list();

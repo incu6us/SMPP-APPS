@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.omg.CORBA.REBIND;
 import org.smpp.Data;
 import org.smpp.ServerPDUEventListener;
 import org.smpp.Session;
@@ -43,17 +44,8 @@ import ua.com.life.smpp.db.service.TextForCampaignManage;
 
 public class SmppConnection {
 
-	// @Autowired
-	// private SmppManage smppSettings;
-	//
-	// @Autowired
-	// private CampaignManage campaign;
-	//
-	// @Autowired
-	// private MsisdnListManage msisdn;
-	//
-	// @Autowired
-	// private TextForCampaignManage text;
+	private volatile static int enquireLinkTimeout = 60000;
+	private static int maxMessagesLimitPerSysId = 100;
 
 	private static Logger LOGGER = Logger.getLogger(SmppConnection.class);
 
@@ -72,6 +64,7 @@ public class SmppConnection {
 	// e.printStackTrace();
 	// }
 	// }
+	
 	/**
 	 * This is the SMPP session used for communication with SMSC.
 	 */
@@ -531,18 +524,20 @@ public class SmppConnection {
 			LOGGER.error("The length of " + descr + " parameter is wrong.");
 		}
 	}
+	
 
 	public void run() {
 		Runnable run = new Runnable() {
 			ApplicationContext ctx = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/manual-context.xml");
 
-			CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+//			CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
 			MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
 			TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
 
 			@Override
 			public void run() {
-
+				
+				// Binding
 				bind();
 
 				Long msisdnOrigId = null;
@@ -552,32 +547,10 @@ public class SmppConnection {
 
 				while (true) {
 
-					List<MsisdnList> msisdnList = msisdn.getByMsisdnByStatus(0, 100);
+					List<MsisdnList> msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitPerSysId);
 					
-					
-					if(msisdnList.size() != 0){
+					if(msisdnList.size() == 0){
 						
-						// Sending messages
-						for (MsisdnList num : msisdnList) {
-							msisdnOrigId = num.getId();
-							msisdnOrigNum = num.getMsisdn();
-							message = text.getTextForCampaignByCompaignId(num.getCampaign().getCampaignId()).getText();
-							sourceAddr = num.getCampaign().getSourceAddr();
-	
-							System.out.println("Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
-							submit(msisdnOrigNum, message, sourceAddr);
-							msisdn.sendToSmsC(msisdnOrigId); 
-						}
-	
-					}else{
-						
-						// Timeout for EnquireLink
-						try {
-							Thread.sleep(5000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
 						
 						// Send EnquireLink
 						try {
@@ -586,7 +559,7 @@ public class SmppConnection {
 						} catch (TimeoutException | PDUException | WrongSessionStateException | IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-	
+							
 							// Rebind if session is closed
 							unbind();
 							while (!isBound()) {
@@ -598,6 +571,29 @@ public class SmppConnection {
 									e1.printStackTrace();
 								}
 							}
+						}
+						
+						// Timeout for EnquireLink
+						try {
+							Thread.sleep(enquireLinkTimeout);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	
+					}else{
+						
+						// Sending messages
+						for (MsisdnList num : msisdnList) {
+							msisdn.sendToSmsC(num.getId()); 
+
+							msisdnOrigId = num.getId();
+							msisdnOrigNum = num.getMsisdn();
+							message = text.getTextForCampaignByCompaignId(num.getCampaign().getCampaignId()).getText();
+							sourceAddr = num.getCampaign().getSourceAddr();
+	
+							System.out.println("--->>> Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
+							submit(msisdnOrigNum, message, sourceAddr);
 						}
 					}
 				}

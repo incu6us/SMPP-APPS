@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -115,14 +116,17 @@ public class Main {
 		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
 		TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
 		
-		for(MsisdnList msisdnObj : msisdn.getByMsisdnByStatus(0)){
-			System.out.println(msisdnObj.getMsisdn()+" "+msisdnObj.getCampaign().getCampaignId());
-			System.out.println(text.getTextForCampaignByCompaignId(msisdnObj.getCampaign().getCampaignId()).getText());
-			msisdn.sendToSmsC(msisdnObj.getId());
-		}
+		msisdn.sendToSmsC("380937530213", "0123", new Date(1410171158*1000), new Date(1410171158), 7, "001");
+		
+//		for(MsisdnList msisdnObj : msisdn.getByMsisdnByStatus(0,100)){
+//			System.out.println(msisdnObj.getMsisdn()+" "+msisdnObj.getCampaign().getCampaignId());
+//			System.out.println(text.getTextForCampaignByCompaignId(msisdnObj.getCampaign().getCampaignId()).getText());
+////			msisdn.sendToSmsC(msisdnObj.getId());
+//		}
 		
 //		List<MsisdnList> msisdnList = msisdn.getByMsisdnByStatus(0, 3);
-//		
+		
+				
 //		for (MsisdnList msisdnObj : msisdnList.subList(0, 1)){
 //			System.out.println(msisdnObj.getMsisdn()+" "+msisdnObj.getCampaign().getCampaignId());
 //		}
