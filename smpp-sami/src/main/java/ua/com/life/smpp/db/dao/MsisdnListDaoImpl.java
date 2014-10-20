@@ -7,6 +7,7 @@ import org.hibernate.Criteria;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -33,7 +34,15 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 
 	@Override
 	public void save(MsisdnList msisdn) {
-		sessionFactory.getCurrentSession().save(msisdn);
+		Session session = sessionFactory.getCurrentSession();
+
+		session.save(msisdn);
+		
+		// flushAndClear
+		if (session.isDirty())  {
+			session.flush();
+			session.clear();
+	    }
 	}
 
 	@Override

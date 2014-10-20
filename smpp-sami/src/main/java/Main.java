@@ -133,6 +133,14 @@ public class Main {
 //			System.out.println(msisdnObj.getMsisdn()+" "+msisdnObj.getCampaign().getCampaignId());
 //		}
 		
+		
+		Long started = System.currentTimeMillis();
+		
+		Thread.sleep(1000);
+		
+		Long finished = System.currentTimeMillis();
+		
+		System.out.println(finished - started);
 	}
 }
 

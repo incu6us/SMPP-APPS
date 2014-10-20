@@ -301,12 +301,11 @@ public class SmppConnection {
 	public void unbind() {
 		try {
 
-			isBound();
-
-			if (!getBound()) {
+			if (!isBound()) {
 				System.out.println("Not bound, cannot unbind: " + sessName);
 				return;
 			}
+			
 			// send the request
 			System.out.println("Going to unbind.");
 			if (session.getReceiver().isReceiver()) {
@@ -346,7 +345,9 @@ public class SmppConnection {
 		byte senderTon = 0;
 		byte senderNpi = 0;
 
-		bind();
+		if(!isBound()){
+			bind();
+		}
 
 		try {
 			SubmitSM request = new SubmitSM();
@@ -581,9 +582,11 @@ public class SmppConnection {
 						}
 	
 					}else{
-						// Sending messages
-						for (MsisdnList num : msisdnList) {
+						//// Sending messages
+						Long started = System.currentTimeMillis();
 
+						for (MsisdnList num : msisdnList) {
+							
 							msisdnOrigId = num.getId();
 							msisdnOrigNum = num.getMsisdn();
 							message = text.getTextForCampaignByCompaignId(num.getCampaign().getCampaignId()).getText();
@@ -591,6 +594,19 @@ public class SmppConnection {
 	
 							System.out.println("--->>> Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
 							submit(msisdnOrigNum, message, sourceAddr);
+							
+							Long finished = System.currentTimeMillis();
+							Long timeResult = finished - started;
+							
+							// check time interval for 1 second
+							if(timeResult < 1000){
+								try {
+									Thread.sleep(1000 - timeResult);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
 						}
 					}
 				}
