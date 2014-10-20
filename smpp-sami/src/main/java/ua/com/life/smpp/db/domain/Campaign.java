@@ -23,7 +23,7 @@ public class Campaign {
 	@Column(name="campaign_id")
 	private Long campaignId;
 	
-	@Column(name="name",length=80, unique=true)
+	@Column(name="name",length=80)
 	private String name;
 	
 	@Column(name="source_addr", length=20)

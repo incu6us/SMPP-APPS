@@ -70,9 +70,9 @@ public class PDUListner implements ServerPDUEventListener {
                 String err = parsedMessage.get("err").trim();
                 
                 if(status.equals("DELIVRD")){
-                	msisdn.sentToSmsC(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 7, err);
+                	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 7, err);
                 }else{
-                	msisdn.sentToSmsC(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, -1, err);
+                	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, -1, err);
                 }
             }
         }

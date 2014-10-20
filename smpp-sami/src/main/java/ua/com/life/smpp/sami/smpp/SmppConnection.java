@@ -44,7 +44,7 @@ import ua.com.life.smpp.db.service.TextForCampaignManage;
 
 public class SmppConnection {
 
-	private volatile static int enquireLinkTimeout = 60000;
+	private volatile static int enquireLinkTimeout = 5000;
 	private static int maxMessagesLimitPerSysId = 100;
 
 	private static Logger LOGGER = Logger.getLogger(SmppConnection.class);
@@ -544,13 +544,12 @@ public class SmppConnection {
 				String msisdnOrigNum = null;
 				String message = null;
 				String sourceAddr = null;
+				List<MsisdnList> msisdnList = null;
 
 				while (true) {
 
-					List<MsisdnList> msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitPerSysId);
-					
+					msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitPerSysId);
 					if(msisdnList.size() == 0){
-						
 						
 						// Send EnquireLink
 						try {
@@ -582,10 +581,8 @@ public class SmppConnection {
 						}
 	
 					}else{
-						
 						// Sending messages
 						for (MsisdnList num : msisdnList) {
-							msisdn.sentToSmsC(num.getId()); 
 
 							msisdnOrigId = num.getId();
 							msisdnOrigNum = num.getMsisdn();

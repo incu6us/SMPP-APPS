@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,26 +38,45 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 
 	@Override
 	public synchronized List<MsisdnList> getByMsisdnByStatus(Integer status) {
+		List<MsisdnList> list;
+		
 		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList where status = :status");
 		q.setInteger("status", status);
-		return q.list();
+		list = q.list();
+		
+		return list;
 	}
 	
 	@Override
 	public synchronized List<MsisdnList> getByMsisdnByStatus(Integer status, int limit) {
-		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList m where status = :status").setMaxResults(limit).setLockMode("m", LockMode.WRITE);
+		List<MsisdnList> list;
+		
+		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList m where status = :status").setMaxResults(limit);
 		q.setInteger("status", status);
-		return q.list();
+		list = q.list();
+		
+		updateSendedToSmsc((List<MsisdnList>) list);
+		
+		return list;
+		
 	}
 
-	@Override
-	public synchronized void sentToSmsC(Long msisdnId) {
-		MsisdnList msisdn = (MsisdnList) sessionFactory.getCurrentSession().get(MsisdnList.class, msisdnId);
-		msisdn.setStatus(1);
+	private synchronized void updateSendedToSmsc(List<MsisdnList> msisdnId) {
+		if(msisdnId.size()!=0){
+			
+			String ids = "";
+			
+			for(MsisdnList msisdn : msisdnId){
+				ids += msisdn.getId()+",";
+			}
+			
+			Query q = (Query) sessionFactory.getCurrentSession().createSQLQuery("update msisdn_list set status=1 where id in ("+ids.substring(0, ids.length()-1)+")");
+			q.executeUpdate();
+		}
 	}
 	
 	@Override
-	public void sentToSmsC(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err) {
+	public void acceptDeliveryReport(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err) {
 		Query q = sessionFactory.getCurrentSession().createQuery("from MsisdnList where msisdn = :msisdn and status=1");
 		q.setString("msisdn", msisdn);
 		
