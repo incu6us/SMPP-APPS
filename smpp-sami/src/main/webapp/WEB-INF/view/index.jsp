@@ -9,105 +9,67 @@
 <!--  <link rel="stylesheet" href='<c:url value="/static/css/login/style.css"></c:url>'>-->
 
 <!-- jQuery -->
-<script type="text/javascript"
-	src='<c:url value="/static/utils/smartmenus-0.9.7/libs/jquery-loader.js"></c:url>'></script>
+<script src='<c:url value="/static/js/control/jquery.min.js"></c:url>'></script>
 
-<!-- SmartMenus jQuery plugin -->
-<script type="text/javascript"
-	src='<c:url value="/static/utils/smartmenus-0.9.7/jquery.smartmenus.js"></c:url>'></script>
-
-<!-- SmartMenus jQuery init -->
-<script type="text/javascript">
-	$(function() {
-		$('#main-menu').smartmenus({
-			subMenusSubOffsetX : 1,
-			subMenusSubOffsetY : -8
-		});
-	});
-</script>
+<!-- Bootstrap -->
+<link rel="stylesheet"
+	href='<c:url value="/static/css/control/bootstrap.min.css"></c:url>' />
+<script
+	src='<c:url value="/static/js/control/bootstrap.min.js"></c:url>'></script>
 
 
-
-
-<!-- SmartMenus core CSS (required) -->
-<link
-	href='<c:url value="/static/utils/smartmenus-0.9.7/css/sm-core-css.css"></c:url>'
-	rel="stylesheet" type="text/css" />
-
-<!-- "sm-blue" menu theme (optional, you can use your own CSS, too) -->
-<link
-	href='<c:url value="/static/utils/smartmenus-0.9.7/css/sm-red/sm-red.css"></c:url>'
-	rel="stylesheet" type="text/css" />
-
-<!-- #main-menu config - instance specific stuff not covered in the theme -->
-<style type="text/css">
-#main-menu {
-	position: relative;
-	z-index: 9999;
-	width: auto;
-}
-
-#main-menu ul {
-	width: 12em;
-	/* fixed width only please - you can use the "subMenusMinWidth"/"subMenusMaxWidth" script options to override this if you like */
-}
-</style>
 </head>
 <body>
+	<div>
+		<nav id="myNavbar" class="navbar navbar-inverse navbar-fixed-top"
+			role="navigation"> <!-- Brand and toggle get grouped for better mobile display -->
+		<div class="container">
+			<div class="navbar-header">
+				<!-- <img src="img/logo.png" alt="logo" width="60px" />-->
+			</div>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse"
+				id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li class="dropdown"><a href="#" data-toggle="dropdown"
+						class="dropdown-toggle">Menu <b class="caret"></b>
+					</a>
+						<ul class="dropdown-menu">
+							<li><a href='<c:url value="/"></c:url>'>Create Campaign</a></li>
+							<li><a href='<c:url value="/stat"></c:url>'>Statistics</a></li>
+							
+						</ul></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li class="dropdown"><a href="#" data-toggle="dropdown"
+						class="dropdown-toggle">VIACHESLAV.PRYIMAK <b class="caret"></b>
+					</a>
+						<ul class="dropdown-menu">
+							<li><a href='<c:url value="/users"></c:url>'>User Management</a></li>
+							<li><a href='<c:url value="/settings"></c:url>'>SMPP Settings</a></li>
+							<li class="divider"></li>
+							<li><a href="?logout">Logout</a></li>
+						</ul></li>
+				</ul>
+			</div>
+		</div>
+		</nav>
+	</div>
 
-	<ul id="main-menu" class="sm sm-red" style="z-index: 1;">
-		<li><a href='<c:url value="/" />'>Home</a></li>
-		<li><a href='<c:url value="/messaging" />'>Messaging</a></li>
-		<li><a href='<c:url value="/bulk" />'>Bulk Messaging</a></li>
-		<li><a href='<c:url value="/settings" />'>Settings</a></li>
-	</ul>
+	<div style="padding: 20px 20px 20px 20px">
+		<div
+			style="margin-top: 60px; padding: 0px 20px 20px 20px; background-color: #eee; border-style: solid; border-color: #ed1848; border-width: 1px;">
 
-	<!-- show user account -->
-	<div style="position: absolute; padding-right: 40px; right: 0; top: 15px; z-index:2;">Logged as: user</div>	
-
-	<div style="margin-top: 20px; padding: 0px 20px 20px 20px;background-color: #eee; border-style:solid; border-color: #ed1848; border-width: 1px;">
-
-		<center><h2>Bulk Messaging:</h2></center>
-		
-		<center>
 			<c:choose>
-				<c:when test="${uploadState=='fileIsEmpty'}">
-					<div style="border-style:solid; border-color: #ed1848; border-width: 1px; width: 200px;">Choose file first!</div>
-				</c:when>
-				<c:when test="${uploadState=='fail'}">
-					<div style="border-style:solid; border-color: #ed1848; border-width: 1px; width: 200px;">Unknown Error!</div>
-				</c:when>
-				<c:when test="${uploadState=='success'}">
-					<div style="border-style:solid; border-color: green; border-width: 1px; width: 200px;">Upload success!</div>
-				</c:when>
+			<c:when test="${pageName=='index'}">
+				<jsp:include page="create_campaign.jsp"></jsp:include>
+			</c:when>
+			<c:when test="${pageName=='stat'}">
+				<jsp:include page="stat.jsp"></jsp:include>
+			</c:when>
 			</c:choose>
-		</center>
-		
-		<c:forEach var="smppSetting" items="${smppSettings}">
-			<%-- ${smppSetting.getName()}<br>--%>
-		</c:forEach>
-		
-		<form method="post" enctype="multipart/form-data" action='<c:url value="/upload" />'">
-			<table border="0">
-				<tr>
-					<td>Campaign Name:</td><td><input name="campName" type="text" /></td>
-				</tr>
-				<tr>
-					<td>Source Address:</td><td><input name="sourceAddress" type="text" /></td>
-				</tr>
-				<tr>
-					<td>MSISDN File:</td><td> <input name="file" type="file" /> </td>
-				</tr>
-				<tr>
-					<td>Text:</td><td><textarea name="message" rows="20" cols="100"></textarea></td>
-				</tr>
-				<tr>
-					<td></td><td><button type="submit">Send</button></td>
-				</tr>
 
-			</table>
-		</form>
-
+		</div>
 	</div>
 </body>
 </html>

@@ -550,6 +550,7 @@ public class SmppConnection {
 				while (true) {
 
 					msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitPerSysId);
+					
 					if(msisdnList.size() == 0){
 						
 						// Send EnquireLink
@@ -595,17 +596,18 @@ public class SmppConnection {
 							System.out.println("--->>> Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
 							submit(msisdnOrigNum, message, sourceAddr);
 							
-							Long finished = System.currentTimeMillis();
-							Long timeResult = finished - started;
-							
-							// check time interval for 1 second
-							if(timeResult < 1000){
-								try {
-									Thread.sleep(1000 - timeResult);
-								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
+						}
+
+						Long finished = System.currentTimeMillis();
+						Long timeResult = finished - started;
+						
+						// check time interval for 1 second
+						if(timeResult < 1000){
+							try {
+								Thread.sleep(1000 - timeResult);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
 						}
 					}

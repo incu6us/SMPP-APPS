@@ -88,27 +88,27 @@ public class Main {
 		 * Compaign add
 		 */
 		
-		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
-		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
-		TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
-		
-		Campaign camp = new Campaign("Test Campaign 1", "test-src");
-		System.out.println("----------------");
-		MsisdnList msisdnRecord = new MsisdnList("380632105719", camp);
-		MsisdnList msisdnRecord1 = new MsisdnList("380937530213", camp);
-		MsisdnList msisdnRecord2 = new MsisdnList("380631234567", camp);
-		
-		TextForCampaign campText = new TextForCampaign("hren kakaja-to...", camp);
-
-		Set<MsisdnList> msisdnList = new HashSet<MsisdnList>();
-		msisdnList.add(msisdnRecord);
-		msisdnList.add(msisdnRecord1);
-		msisdnList.add(msisdnRecord2);
-		
-		campaign.save(camp);
-		text.save(campText);
-		msisdn.save(msisdnList);
-		
+//		CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+//		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+//		TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
+//		
+//		Campaign camp = new Campaign("Test Campaign 1", "test-src");
+//		System.out.println("----------------");
+//		MsisdnList msisdnRecord = new MsisdnList("380632105719", camp);
+//		MsisdnList msisdnRecord1 = new MsisdnList("380937530213", camp);
+//		MsisdnList msisdnRecord2 = new MsisdnList("380631234567", camp);
+//		
+//		TextForCampaign campText = new TextForCampaign("hren kakaja-to...", camp);
+//
+//		Set<MsisdnList> msisdnList = new HashSet<MsisdnList>();
+//		msisdnList.add(msisdnRecord);
+//		msisdnList.add(msisdnRecord1);
+//		msisdnList.add(msisdnRecord2);
+//		
+//		campaign.save(camp);
+//		text.save(campText);
+//		msisdn.save(msisdnList);
+//		
 		
 		/*
 		 * Campaign show all
@@ -133,14 +133,6 @@ public class Main {
 //			System.out.println(msisdnObj.getMsisdn()+" "+msisdnObj.getCampaign().getCampaignId());
 //		}
 		
-		
-		Long started = System.currentTimeMillis();
-		
-		Thread.sleep(1000);
-		
-		Long finished = System.currentTimeMillis();
-		
-		System.out.println(finished - started);
 	}
 }
 

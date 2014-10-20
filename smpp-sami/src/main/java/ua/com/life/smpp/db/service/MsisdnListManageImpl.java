@@ -44,11 +44,6 @@ public class MsisdnListManageImpl implements MsisdnListManage {
 		return msisdnListDao.getByMsisdnByStatus(status, limit);
 	}
 
-//	@Transactional
-//	public void sentToSmsC(Long msisdnId) {
-//		msisdnListDao.sentToSmsC(msisdnId);
-//	}
-
 	@Transactional
 	public void acceptDeliveryReport(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err) {
 		msisdnListDao.acceptDeliveryReport(msisdn, messageId, submitDate, doneDate, status, err);

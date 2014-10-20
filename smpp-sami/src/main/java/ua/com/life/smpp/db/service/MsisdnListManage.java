@@ -12,6 +12,5 @@ import ua.com.life.smpp.db.domain.MsisdnList;
 	public List<MsisdnList> getAllMsisdnList();
 	public void save(Set<MsisdnList> msisdnList);
 	
-//	public void sentToSmsC(Long msisdnId);
 	public void acceptDeliveryReport(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err);
 }
