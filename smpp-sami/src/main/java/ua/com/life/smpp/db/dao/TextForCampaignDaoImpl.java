@@ -5,7 +5,12 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.internal.CriteriaImpl.CriterionEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -44,5 +49,8 @@ public class TextForCampaignDaoImpl implements TextForCampaignDao {
 		sessionFactory.getCurrentSession().save(compaignText);
 	}
 
-
+	public Integer totalMessageByCampaignId(Long campaignId){
+		Criteria q = (Criteria) sessionFactory.getCurrentSession().createCriteria("TextForCampaign").setProjection(Projections.rowCount()).add(Restrictions.eq("status", ))
+		return null;
+	}
 }
