@@ -49,4 +49,28 @@ public class MsisdnListManageImpl implements MsisdnListManage {
 		msisdnListDao.acceptDeliveryReport(msisdn, messageId, submitDate, doneDate, status, err);
 	}
 
+	@Transactional
+	public Integer totalMessagesByCampaignId(Long campaignId) {
+		return msisdnListDao.totalMessagesByCampaignId(campaignId);
+	}
+
+	@Transactional
+	public Integer inActionMessagesByCampaignId(Long campaignId) {
+		return msisdnListDao.inActionMessagesByCampaignId(campaignId);
+	}
+
+	@Transactional
+	public Integer successMessagesByCampaignId(Long campaignId) {
+		return msisdnListDao.successMessagesByCampaignId(campaignId);
+	}
+
+	@Transactional
+	public Integer unsuccessMessagesByCampaignId(Long campaignId) {
+		return msisdnListDao.unsuccessMessagesByCampaignId(campaignId);
+	}
+	
+	@Transactional
+	public String messageStatusByCampaignIdInJson(Long campaignId){
+		return msisdnListDao.messageStatusByCampaignIdInJson(campaignId);
+	}
 }

@@ -49,9 +49,4 @@ public class TextForCampaignDaoImpl implements TextForCampaignDao {
 		sessionFactory.getCurrentSession().save(compaignText);
 	}
 
-	@Override
-	public Integer totalMessageByCampaignId(Long campaignId){
-		Criteria q = (Criteria) sessionFactory.getCurrentSession().createCriteria(TextForCampaign.class).setProjection(Projections.rowCount()).add(Restrictions.eq("campaign", campaignId));
-		return (Integer) q.list().get(0);
-	}
 }

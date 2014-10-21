@@ -41,9 +41,4 @@ public class TextForCampaignManageImpl implements TextForCampaignManage {
 		text.save(compaignText);
 	}
 
-	@Override
-	public Integer totalMessageByCampaignId(Long campaignId) {
-		return text.totalMessageByCampaignId(campaignId);
-	}
-
 }

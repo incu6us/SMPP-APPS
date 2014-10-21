@@ -13,4 +13,11 @@ import ua.com.life.smpp.db.domain.MsisdnList;
 	public void save(Set<MsisdnList> msisdnList);
 	
 	public void acceptDeliveryReport(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err);
+	
+	public Integer totalMessagesByCampaignId(Long campaignId);
+	public Integer inActionMessagesByCampaignId(Long campaignId);
+	public Integer successMessagesByCampaignId(Long campaignId);
+	public Integer unsuccessMessagesByCampaignId(Long campaignId);
+	
+	public String messageStatusByCampaignIdInJson(Long campaignId);
 }

@@ -10,5 +10,4 @@ public interface TextForCampaignDao {
 	public TextForCampaign getTextForCampaignByCompaignName(String campaignName);
 	public List<TextForCampaign> getAllTexts();
 	public void save(TextForCampaign compaignText);	
-	public Integer totalMessageByCampaignId(Long campaignId);
 }

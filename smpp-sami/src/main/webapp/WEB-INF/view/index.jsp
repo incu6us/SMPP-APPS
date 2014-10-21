@@ -17,7 +17,32 @@
 <script
 	src='<c:url value="/static/js/control/bootstrap.min.js"></c:url>'></script>
 
-
+<c:if test="${pageSubName == 'statDetails'}">
+	<script type="text/javascript">
+	$(document).ready(function () {
+	    var interval = 2000;   //number of mili seconds between each call
+	    var refresh = function() {
+	        $.ajax({
+	            url: "rest/getMessageCountsByStatuses/7",
+	            type: 'GET',
+	            cache: false,
+	            dataType: 'json',
+	            success: function(html) {
+	                $('#totalMessages').html(JSON.stringify(html['total']));
+	                $('#sendingMessages').html(JSON.stringify(html['sending']));
+	                $('#successMessages').html(JSON.stringify(html['success']));
+	                $('#undeliveredMessages').html(JSON.stringify(html['unsuccess']));
+	                setTimeout(function() {
+	                    refresh();
+	                    console.debug(JSON.stringify(html));
+	                }, interval);
+	            }
+	        });
+	    };
+	    refresh();
+	});
+	</script>
+</c:if>
 </head>
 <body>
 	<div>
@@ -37,7 +62,7 @@
 						<ul class="dropdown-menu">
 							<li><a href='<c:url value="/"></c:url>'>Create Campaign</a></li>
 							<li><a href='<c:url value="/stat"></c:url>'>Statistics</a></li>
-							
+
 						</ul></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
@@ -45,8 +70,10 @@
 						class="dropdown-toggle">VIACHESLAV.PRYIMAK <b class="caret"></b>
 					</a>
 						<ul class="dropdown-menu">
-							<li><a href='<c:url value="/users"></c:url>'>User Management</a></li>
-							<li><a href='<c:url value="/settings"></c:url>'>SMPP Settings</a></li>
+							<li><a href='<c:url value="/users"></c:url>'>User
+									Management</a></li>
+							<li><a href='<c:url value="/settings"></c:url>'>SMPP
+									Settings</a></li>
 							<li class="divider"></li>
 							<li><a href="?logout">Logout</a></li>
 						</ul></li>
@@ -61,12 +88,12 @@
 			style="margin-top: 60px; padding: 0px 20px 20px 20px; background-color: #eee; border-style: solid; border-color: #ed1848; border-width: 1px;">
 
 			<c:choose>
-			<c:when test="${pageName=='index'}">
-				<jsp:include page="create_campaign.jsp"></jsp:include>
-			</c:when>
-			<c:when test="${pageName=='stat'}">
-				<jsp:include page="stat.jsp"></jsp:include>
-			</c:when>
+				<c:when test="${pageName=='index'}">
+					<jsp:include page="create_campaign.jsp"></jsp:include>
+				</c:when>
+				<c:when test="${pageName=='stat'}">
+					<jsp:include page="stat.jsp"></jsp:include>
+				</c:when>
 			</c:choose>
 
 		</div>

@@ -9,11 +9,15 @@ import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import ua.com.life.smpp.db.domain.Campaign;
 import ua.com.life.smpp.db.domain.MsisdnList;
+import ua.com.life.smpp.db.domain.TextForCampaign;
 
 @Repository
 public class MsisdnListDaoImpl implements MsisdnListDao {
@@ -100,4 +104,64 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 		}
 	}
 	
+	@Override
+	public Integer totalMessagesByCampaignId(Long campaignId){
+		Integer totalCount = null;
+		Criteria c = (Criteria) sessionFactory.getCurrentSession().createCriteria(MsisdnList.class)
+				.add(Restrictions.eq("campaign", sessionFactory.getCurrentSession().load(Campaign.class, campaignId)))
+				.setProjection(Projections.rowCount());
+		
+		totalCount = Integer.parseInt(c.list().get(0).toString());
+		return totalCount;
+	}
+
+	@Override
+	public Integer inActionMessagesByCampaignId(Long campaignId) {
+		Integer totalCount = null;
+		Criteria c = (Criteria) sessionFactory.getCurrentSession().createCriteria(MsisdnList.class)
+				.add(Restrictions.eq("campaign",sessionFactory.getCurrentSession().load(Campaign.class, campaignId)))
+				.add(Restrictions.eq("status", 1))
+				.setProjection(Projections.rowCount());
+		
+		totalCount = Integer.parseInt(c.list().get(0).toString());
+		return totalCount;
+	}
+
+	@Override
+	public Integer successMessagesByCampaignId(Long campaignId) {
+		Integer totalCount = null;
+		Criteria c = (Criteria) sessionFactory.getCurrentSession().createCriteria(MsisdnList.class)
+				.add(Restrictions.eq("campaign", sessionFactory.getCurrentSession().load(Campaign.class, campaignId)))
+				.add(Restrictions.eq("status", 7))
+				.setProjection(Projections.rowCount());
+		
+		totalCount = Integer.parseInt(c.list().get(0).toString());
+		return totalCount;
+	}
+
+	@Override
+	public Integer unsuccessMessagesByCampaignId(Long campaignId) {
+		Integer totalCount = null;
+		Criteria c = (Criteria) sessionFactory.getCurrentSession().createCriteria(MsisdnList.class)
+				.add(Restrictions.eq("campaign", sessionFactory.getCurrentSession().load(Campaign.class, campaignId)))
+				.add(Restrictions.eq("status", -1))
+				.setProjection(Projections.rowCount());
+		
+		totalCount = Integer.parseInt(c.list().get(0).toString());
+		return totalCount;
+	}
+	
+	@Override
+	public String messageStatusByCampaignIdInJson(Long campaignId){
+		String jsonResult = "{}";
+		Query total = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*)from msisdn_list where campaign_id = :campaignId").setLong("campaignId", campaignId);
+		Query sending = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*)from msisdn_list where status = 1 and campaign_id = :campaignId").setLong("campaignId", campaignId);
+		Query success = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*)from msisdn_list where status = 7 and campaign_id = :campaignId").setLong("campaignId", campaignId);
+		Query unsuccess = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*)from msisdn_list where status = -1 and campaign_id = :campaignId").setLong("campaignId", campaignId);
+
+		jsonResult = "{ \"total\" : "+(String) total.list().get(0).toString()+", \"sending\" : "+(String) sending.list().get(0).toString()+", "
+				+ "\"success\" :  "+(String) success.list().get(0).toString()+", \"unsuccess\" : "+(String) unsuccess.list().get(0).toString()+" }";
+		
+		return jsonResult;
+	}
 }

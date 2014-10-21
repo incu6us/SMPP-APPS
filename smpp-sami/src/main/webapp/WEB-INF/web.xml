@@ -34,7 +34,7 @@ http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
-	<!-- <servlet>
+	<servlet>
 		<servlet-name>jersey-servlet</servlet-name>
 		<servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
 		<init-param>
@@ -47,8 +47,8 @@ http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 
 	<servlet-mapping>
 		<servlet-name>jersey-servlet</servlet-name>
-		<url-pattern>/request/*</url-pattern>
-	</servlet-mapping>-->
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
 
 	<!-- <filter>
         <filter-name>springSecurityFilterChain</filter-name>

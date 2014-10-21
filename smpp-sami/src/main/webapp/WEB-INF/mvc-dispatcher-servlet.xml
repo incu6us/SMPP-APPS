@@ -9,7 +9,8 @@
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
-        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
 	<mvc:annotation-driven />
 	<mvc:resources mapping="/static/**" location="/static/" />
@@ -46,6 +47,7 @@
 	<context:component-scan base-package="ua.com.life.smpp.db.domain"></context:component-scan>
 	<context:component-scan base-package="ua.com.life.smpp.db.service"></context:component-scan>
 	<context:component-scan base-package="ua.com.life.ui.controller"></context:component-scan>
+	<context:component-scan base-package="ua.com.life.sami.rest"></context:component-scan>
 
 	<!-- Configure JDBC Connection -->
 	<bean id="dataSource"
