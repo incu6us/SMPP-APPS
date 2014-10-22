@@ -5,6 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
+
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity
 @Table(name="smpp_settings")
@@ -35,6 +39,9 @@ public class SmppSettings {
 	@Column(name="speed", length=5)
 	private int maxMessagesLimitForSysId;
 	
+	@Version
+	private Long version = new Long(0);
+	
 
 	public SmppSettings() {
 	}
@@ -60,9 +67,8 @@ public class SmppSettings {
 		this.active = active;
 	}
 
-	public SmppSettings(Long id, String name, String systemId, String password,
+	public SmppSettings(String name, String systemId, String password,
 			String host, int port, int active, int maxMessagesLimitForSysId) {
-		this.id = id;
 		this.name = name;
 		this.systemId = systemId;
 		this.password = password;
@@ -135,6 +141,14 @@ public class SmppSettings {
 
 	public void setMaxMessagesLimitForSysId(int maxMessagesLimitForSysId) {
 		this.maxMessagesLimitForSysId = maxMessagesLimitForSysId;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 	
 }

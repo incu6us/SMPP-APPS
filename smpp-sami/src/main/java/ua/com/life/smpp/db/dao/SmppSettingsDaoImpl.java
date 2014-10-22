@@ -39,6 +39,14 @@ public class SmppSettingsDaoImpl implements SmppSettingsDao{
 		
 		return (SmppSettings) q.list().get(0);
 	}
+	
+	@Override
+	public SmppSettings getSettingsByName(String name) {
+		Query q = sessionFactory.getCurrentSession().createQuery("from SmppSettings where name=?");
+		q.setString(0, name);
+		
+		return (SmppSettings) q.list().get(0);
+	}
 
 	@Override
 	public List<SmppSettings> getActiveAccounts() {
@@ -67,9 +75,23 @@ public class SmppSettingsDaoImpl implements SmppSettingsDao{
 
 	@Override
 	public void changeSpeed(Long id, int speed){
-		Query q = (Query) sessionFactory.getCurrentSession().createQuery("update SmppSettings set maxMessagesLimitForSysId = :maxMessagesLimitForSysId where id = :id");
+		Query q = (Query) sessionFactory.getCurrentSession().createQuery("update SmppSettings set maxMessagesLimitForSysId = :maxMessagesLimitForSysId, version=version+1 where id = :id");
 		q.setLong("id", id);
 		q.setInteger("maxMessagesLimitForSysId", speed);
 		q.executeUpdate();
+	}
+	
+	@Override
+	public void changeSystemIdById(Long id, String systemId, String password, String host, int port, int active, int speed){
+		sessionFactory.getCurrentSession().createSQLQuery("update smpp_settings set name = :systemId, system_id = :systemId,"
+				+ "password = :passwd, host = :host, port = :port, active = :active, speed = :speed, version=version+1 where id = :id")
+				.setString("systemId", systemId)
+				.setString("passwd", password)
+				.setString("host", host)
+				.setInteger("port", port)
+				.setInteger("active", active)
+				.setInteger("speed", speed)
+				.setLong("id", id)
+				.executeUpdate();
 	}
 }

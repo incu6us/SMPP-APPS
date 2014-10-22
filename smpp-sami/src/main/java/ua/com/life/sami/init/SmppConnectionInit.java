@@ -44,10 +44,8 @@ public class SmppConnectionInit {
 	private TextForCampaignManage text;
 	
 	private Set<SmppConnection> connection = new HashSet<SmppConnection>();
-	private Thread bind;
-	private ExecutorService execService;
 
-
+	
 	@PostConstruct
 	public void init() throws InterruptedException {
 

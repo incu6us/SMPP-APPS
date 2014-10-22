@@ -22,6 +22,7 @@ public class SmppManageImpl implements SmppManage {
 
 	@Transactional
 	public void addSmppAccount(SmppSettings smppSettings) {
+		smppSettings.setVersion(new Long(0));
 		settingsDao.addSmppAccount(smppSettings);
 	}
 
@@ -35,6 +36,11 @@ public class SmppManageImpl implements SmppManage {
 		return settingsDao.getSettingsById(id);
 	}
 
+	@Transactional
+	public SmppSettings getSettingsByName(String name) {
+		return settingsDao.getSettingsByName(name);
+	}
+	
 	@Transactional
 	public List<SmppSettings> getActiveAccounts() {
 		return settingsDao.getActiveAccounts();
@@ -58,6 +64,11 @@ public class SmppManageImpl implements SmppManage {
 	@Transactional
 	public void changeSpeed(Long id, int speed){
 		settingsDao.changeSpeed(id, speed);
+	}
+	
+	@Transactional
+	public void changeSystemIdById(Long id, String systemId, String password, String host, int port, int active, int speed){
+		settingsDao.changeSystemIdById(id, systemId, password, host, port, active, speed);
 	}
 	
 }

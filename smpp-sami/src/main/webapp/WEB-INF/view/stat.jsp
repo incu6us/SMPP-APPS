@@ -14,6 +14,9 @@
 	
 	<table class="table table-striped table-bordered">
 		<th><center>
+				<b>#</b>
+			</center></th>
+		<th><center>
 				<b>Campaign name:</b>
 			</center></th>
 		<th><center>
@@ -35,8 +38,9 @@
 				<b>Unsuccess Messages:</b>
 			</center></th>
 		<th></th>
-		<c:forEach items="${messageObjects}" var="messageObject">
+		<c:forEach items="${messageObjects}" var="messageObject" varStatus="rowCounter">
 			<tr>
+				<td>${rowCounter.index+1}</td>
 				<td><center><a
 					href='<c:url value="/stat/list?campaign_id=${messageObject.campaignId}"></c:url>' class="btn btn-default btn-xs">${messageObject.campaignName}</a></center></td>
 				<td>${messageObject.campaignSourceAddres}</td>

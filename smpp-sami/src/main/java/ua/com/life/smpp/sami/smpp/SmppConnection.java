@@ -1,14 +1,11 @@
 package ua.com.life.smpp.sami.smpp;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.hibernate.ejb.criteria.predicate.IsEmptyPredicate;
-import org.omg.CORBA.REBIND;
 import org.smpp.Data;
 import org.smpp.ServerPDUEventListener;
 import org.smpp.Session;
@@ -20,32 +17,24 @@ import org.smpp.pdu.AddressRange;
 import org.smpp.pdu.BindRequest;
 import org.smpp.pdu.BindResponse;
 import org.smpp.pdu.BindTransciever;
-import org.smpp.pdu.EnquireLink;
-import org.smpp.pdu.EnquireLinkResp;
 import org.smpp.pdu.PDUException;
 import org.smpp.pdu.SubmitSM;
 import org.smpp.pdu.SubmitSMResp;
 import org.smpp.pdu.Unbind;
 import org.smpp.pdu.UnbindResp;
 import org.smpp.pdu.WrongLengthOfStringException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import ua.com.life.smpp.db.domain.MsisdnList;
 import ua.com.life.smpp.db.domain.SmppSettings;
-import ua.com.life.smpp.db.service.CampaignManage;
 import ua.com.life.smpp.db.service.MsisdnListManage;
 import ua.com.life.smpp.db.service.SmppManage;
 import ua.com.life.smpp.db.service.TextForCampaignManage;
 
 public class SmppConnection {
 
-	private volatile static int enquireLinkTimeout = 60000;
+	private volatile static int enquireLinkTimeout = 5000;
 //	private static int maxMessagesLimitPerSysId = 100;
 	
 	private static Logger LOGGER = Logger.getLogger(SmppConnection.class);
@@ -537,6 +526,7 @@ public class SmppConnection {
 		Runnable run = new Runnable() {
 			ApplicationContext ctx = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/manual-context.xml");
 
+			SmppManage smppSettings = (SmppManage) ctx.getBean("smppManageImpl");
 //			CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
 			MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
 			TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
@@ -553,6 +543,7 @@ public class SmppConnection {
 				String sourceAddr = null;
 				String validityPeriod = null;
 				List<MsisdnList> msisdnList = null;
+				Long oldSmppSettingVersion = smppSettings.getSettingsByName(sessName).getVersion();
 
 				while (true) {
 
@@ -618,6 +609,33 @@ public class SmppConnection {
 								e.printStackTrace();
 							}
 						}
+					}
+					
+					Long newSmppSettingVersion = smppSettings.getSettingsByName(sessName).getVersion();
+					if(oldSmppSettingVersion != newSmppSettingVersion){
+						
+						unbind();
+						
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						SmppSettings smppSetting = smppSettings.getSettingsByName(sessName);
+						new SmppConnection(smppSetting);
+						oldSmppSettingVersion = newSmppSettingVersion;
+						
+						bind();
+						
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
 					}
 				}
 			}
