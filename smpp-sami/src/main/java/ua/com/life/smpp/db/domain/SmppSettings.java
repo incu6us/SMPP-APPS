@@ -32,6 +32,8 @@ public class SmppSettings {
 	@Column(name="active", length=1)
 	private int active;
 	
+	@Column(name="speed", length=5)
+	private int maxMessagesLimitForSysId;
 	
 
 	public SmppSettings() {
@@ -58,7 +60,17 @@ public class SmppSettings {
 		this.active = active;
 	}
 
-
+	public SmppSettings(Long id, String name, String systemId, String password,
+			String host, int port, int active, int maxMessagesLimitForSysId) {
+		this.id = id;
+		this.name = name;
+		this.systemId = systemId;
+		this.password = password;
+		this.host = host;
+		this.port = port;
+		this.active = active;
+		this.maxMessagesLimitForSysId = maxMessagesLimitForSysId;
+	}
 
 
 	public Long getId() {
@@ -115,6 +127,14 @@ public class SmppSettings {
 
 	public void setActive(int active) {
 		this.active = active;
+	}
+
+	public int getMaxMessagesLimitForSysId() {
+		return maxMessagesLimitForSysId;
+	}
+
+	public void setMaxMessagesLimitForSysId(int maxMessagesLimitForSysId) {
+		this.maxMessagesLimitForSysId = maxMessagesLimitForSysId;
 	}
 	
 }

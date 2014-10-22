@@ -31,6 +31,9 @@ public class MsisdnList {
 	@Column(name="done_date")
 	private Date readingDate;
 	
+	@Column(name="validity_period", length=16)  
+	private String validityPeriod = "000000020000000R";		// 2 hours
+	
 	@Column(length=5, nullable=false)
 	private Integer status;
 	
@@ -59,6 +62,14 @@ public class MsisdnList {
 		this.msisdn = msisdn;
 		this.sendingDate = new Date(System.currentTimeMillis());
 		this.status = 0;
+		this.campaign = camaign;
+	}
+	
+	public MsisdnList(String msisdn, Campaign camaign, String validityPeriod) {
+		this.msisdn = msisdn;
+		this.sendingDate = new Date(System.currentTimeMillis());
+		this.status = 0;
+		this.validityPeriod = validityPeriod;
 		this.campaign = camaign;
 	}
 	
@@ -141,5 +152,12 @@ public class MsisdnList {
 		this.campaign = campaign;
 	}
 	
+	public String getValidityPeriod() {
+		return validityPeriod;
+	}
+
+	public void setValidityPeriod(String validityPeriod) {
+		this.validityPeriod = validityPeriod;
+	}
 
 }

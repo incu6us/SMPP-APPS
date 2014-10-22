@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import ua.com.life.smpp.db.domain.Campaign;
+import ua.com.life.smpp.db.domain.MsisdnList;
 import ua.com.life.smpp.db.service.CampaignManage;
 import ua.com.life.smpp.db.service.MsisdnListManage;
 import ua.com.life.smpp.db.service.TextForCampaignManage;
@@ -56,10 +57,11 @@ public class StatisticController {
 		return "index";
 	}
 	
-	@RequestMapping(params={"campaing_id"}, method=RequestMethod.GET)
-	public String renderStatByCampaign(@RequestParam("campaing_id") String campaignId, Model model){
+	@RequestMapping(value="list",params={"campaign_id"}, method=RequestMethod.GET)
+	public String renderStatByCampaign(@RequestParam("campaign_id") String campaignId, Model model){
 		model.addAttribute("pageName", "stat");
 		model.addAttribute("pageSubName", "statDetails");
+		model.addAttribute("campaignId", campaignId);
 		
 		Campaign camp = campaign.getByCampaignId(Long.parseLong(campaignId));
 		
@@ -67,8 +69,20 @@ public class StatisticController {
 		
 		model.addAttribute("messageObject", messageObject);
 		
-//		model.addAttribute("tmp", msisdn.messageStatusByCampaignIdInJson(new Long(7)));
-		
 		return "index";
+	}
+	
+	@RequestMapping(value="delete",params={"campaign_id"}, method=RequestMethod.GET)
+	public String deleteStatFromCampaign(@RequestParam("campaign_id") String campaignId, Model model){
+//		model.addAttribute("pageName", "stat");
+//		model.addAttribute("campaignId", campaignId);
+		
+		msisdn.deleteMsisdnsByCampaignId(Long.parseLong(campaignId));
+		text.deleteTextByCampaignId(Long.parseLong(campaignId));
+		
+		Campaign camp = campaign.getByCampaignId(Long.parseLong(campaignId));
+		campaign.delete(camp);
+		
+		return "redirect:/stat";
 	}
 }

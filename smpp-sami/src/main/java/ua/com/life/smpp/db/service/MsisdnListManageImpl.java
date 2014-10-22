@@ -45,6 +45,11 @@ public class MsisdnListManageImpl implements MsisdnListManage {
 	}
 
 	@Transactional
+	public void deleteMsisdnsByCampaignId(Long campaignId){
+		msisdnListDao.deleteMsisdnsByCampaignId(campaignId);
+	}
+	
+	@Transactional
 	public void acceptDeliveryReport(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err) {
 		msisdnListDao.acceptDeliveryReport(msisdn, messageId, submitDate, doneDate, status, err);
 	}

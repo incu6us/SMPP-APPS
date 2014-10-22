@@ -17,13 +17,26 @@
 <script
 	src='<c:url value="/static/js/control/bootstrap.min.js"></c:url>'></script>
 
+<script type="text/javascript">
+/*
+*	Char counter
+*/
+// to display the text areas length
+function len_display(Object,MaxLen,element){
+    var len_remain = MaxLen+Object.value.length;
+    if(len_remain >=0){
+    	document.getElementById(element).value=len_remain; 
+    }
+}
+</script>
+
 <c:if test="${pageSubName == 'statDetails'}">
 	<script type="text/javascript">
 	$(document).ready(function () {
-	    var interval = 2000;   //number of mili seconds between each call
+	    var interval = 5000;   //number of mili seconds between each call
 	    var refresh = function() {
 	        $.ajax({
-	            url: "rest/getMessageCountsByStatuses/7",
+	            url: "<c:url value='/rest/getMessageCountsByStatuses/'></c:url>${campaignId}",
 	            type: 'GET',
 	            cache: false,
 	            dataType: 'json',
@@ -72,7 +85,7 @@
 						<ul class="dropdown-menu">
 							<li><a href='<c:url value="/users"></c:url>'>User
 									Management</a></li>
-							<li><a href='<c:url value="/settings"></c:url>'>SMPP
+							<li><a href='<c:url value="/smpp_settings"></c:url>'>SMPP
 									Settings</a></li>
 							<li class="divider"></li>
 							<li><a href="?logout">Logout</a></li>
@@ -85,7 +98,7 @@
 
 	<div style="padding: 20px 20px 20px 20px">
 		<div
-			style="margin-top: 60px; padding: 0px 20px 20px 20px; background-color: #eee; border-style: solid; border-color: #ed1848; border-width: 1px;">
+			style="margin-top: 60px; padding: 0px 20px 20px 20px; background-color: #94ADCA; border-style: solid; border-color: #2B4868; border-width: 1px;">
 
 			<c:choose>
 				<c:when test="${pageName=='index'}">
@@ -93,6 +106,9 @@
 				</c:when>
 				<c:when test="${pageName=='stat'}">
 					<jsp:include page="stat.jsp"></jsp:include>
+				</c:when>
+				<c:when test="${pageName=='smppSettings'}">
+					<jsp:include page="smpp_settings.jsp"></jsp:include>
 				</c:when>
 			</c:choose>
 

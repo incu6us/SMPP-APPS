@@ -55,5 +55,9 @@ public class SmppManageImpl implements SmppManage {
 		return settingsDao.getActiveAccount(id);
 	}
 
+	@Transactional
+	public void changeSpeed(Long id, int speed){
+		settingsDao.changeSpeed(id, speed);
+	}
 	
 }

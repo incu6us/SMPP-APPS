@@ -4,8 +4,12 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <center>
-	<h2>Bulk Messaging:</h2>
+	<h2>
+		<span class="label label-success">Create Campaign:</span>
+	</h2>
 </center>
+
+<br>
 
 <center>
 	<c:choose>
@@ -31,29 +35,89 @@
 	<%-- ${smppSetting.getName()}<br>--%>
 </c:forEach>
 
-<form method="post" enctype="multipart/form-data"
-	action='<c:url value="/upload" />'">
-	<table border="0">
-		<tr>
-			<td>Campaign Name:</td>
-			<td><input name="campName" type="text" /></td>
-		</tr>
-		<tr>
-			<td>Source Address:</td>
-			<td><input name="sourceAddress" type="text" /></td>
-		</tr>
-		<tr>
-			<td>MSISDN File:</td>
-			<td><input name="file" type="file" /></td>
-		</tr>
-		<tr>
-			<td>Text:</td>
-			<td><textarea name="message" rows="20" cols="100"></textarea></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td><button type="submit">Send</button></td>
-		</tr>
+<form class="form-horizontal" method="post"
+	enctype="multipart/form-data" action='<c:url value="/upload" />'">
+	<fieldset>
 
-	</table>
+		<!-- Form Name -->
+		<center><legend style="width: 600px;"></legend></center>
+
+		<!-- Text input-->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="campName">Campaign
+				Name</label>
+			<div class="col-md-4">
+				<input id="campName" name="campName"
+					placeholder="campaign identifier" class="form-control input-md"
+					required="" type="text">
+
+			</div>
+		</div>
+
+		<!-- Text input-->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="sourceAddress">Source
+				Address</label>
+			<div class="col-md-4">
+				<input id="sourceAddress" name="sourceAddress" placeholder=""
+					class="form-control input-md" required="" type="text"> <span
+					class="help-block">example: alpha-name or msisdn</span>
+			</div>
+		</div>
+
+		<!-- Select Validity Period -->
+		<div class="form-group">
+		  <label class="col-md-4 control-label" for="validityPeriod">Validity period</label>
+		  <div class="col-md-4">
+		    <select id="validityPeriod" name="validityPeriod" class="form-control">
+		      <option value="000000001500000R">15 min</option>
+		      <option value="000000003000000R">30 min</option>
+		      <option value="000000010000000R">1 hour</option>
+		      <option value="000000020000000R" selected="selected">2 hours</option>
+		      <option value="000000030000000R">3 hours</option>
+		      <option value="000000060000000R">6 hours</option>
+		      <option value="000000115959000R">12 hours</option>
+		      <option value="000001000000000R">1 day</option>
+		      <option value="000003000000000R">3 days</option>
+		      <option value="000005000000000R">5 days</option>
+		      <option value="000007000000000R">7 days</option>
+		    </select>
+		  </div>
+		</div>
+
+		<!-- File Button -->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="file">Uploaded
+				File</label>
+			<div class="col-md-4">
+				<input id="file" name="file" class="input-file" type="file">
+			</div>
+		</div>
+
+		<!-- Textarea -->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="message">Message
+				Text</label>
+			<div class="col-md-4">
+				<textarea class="form-control" rows="20" cols="100" id="message"
+					name="message" onKeyUp="len_display(this,0,'long_len')"></textarea>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<p class="col-sm-4 control-label">
+			<div class="col-sm-4">
+				<input type="text" id="long_len" value="0" class="len" disabled="disabled" size="5"> <label style="color: white;">Char(s)</label>
+			</div>
+		</div>
+
+		<!-- Button -->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="submit"></label>
+			<div class="col-md-4">
+				<button id="submit" name="submit" class="btn btn-default">Submit</button>
+			</div>
+		</div>
+
+	</fieldset>
 </form>

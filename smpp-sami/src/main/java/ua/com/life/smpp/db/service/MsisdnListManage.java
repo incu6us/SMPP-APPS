@@ -9,6 +9,7 @@ import ua.com.life.smpp.db.domain.MsisdnList;
 	public MsisdnList getByMsisdnId(Long id);
 	public List<MsisdnList> getByMsisdnByStatus(Integer status);
 	public List<MsisdnList> getByMsisdnByStatus(Integer status, int limit);
+	public void deleteMsisdnsByCampaignId(Long campaignId);
 	public List<MsisdnList> getAllMsisdnList();
 	public void save(Set<MsisdnList> msisdnList);
 	

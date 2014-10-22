@@ -30,4 +30,9 @@ public class CampaignManageImpl implements CampaignManage {
 		return campaignDao.save(compaign);
 	}
 
+	@Transactional
+	public void delete(Campaign campaign) {
+		campaignDao.delete(campaign);
+	}
+
 }

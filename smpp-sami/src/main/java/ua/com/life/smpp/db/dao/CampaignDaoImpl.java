@@ -6,6 +6,7 @@ import javax.management.Query;
 
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +16,9 @@ import ua.com.life.smpp.db.domain.Campaign;
 @Repository
 public class CampaignDaoImpl implements CampaignDao {
 
-	@Autowired 
+	@Autowired
 	private SessionFactory sessionFactory;
-	
+
 	@Override
 	public Campaign getByCampaignId(Long id) {
 		return (Campaign) sessionFactory.getCurrentSession().get(Campaign.class, id);
@@ -25,7 +26,7 @@ public class CampaignDaoImpl implements CampaignDao {
 
 	@Override
 	public List<Campaign> getAllCampaign() {
-		Criteria c = (Criteria) sessionFactory.getCurrentSession().createCriteria(Campaign.class);
+		Criteria c = (Criteria) sessionFactory.getCurrentSession().createCriteria(Campaign.class).addOrder(Order.desc("campaignId"));
 		return c.list();
 	}
 
@@ -34,4 +35,8 @@ public class CampaignDaoImpl implements CampaignDao {
 		return (Long) sessionFactory.getCurrentSession().save(campaign);
 	}
 
+	@Override
+	public void delete(Campaign campaign) {
+		sessionFactory.getCurrentSession().delete(campaign);
+	}
 }

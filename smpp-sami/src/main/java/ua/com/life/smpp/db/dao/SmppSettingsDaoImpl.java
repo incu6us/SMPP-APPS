@@ -65,5 +65,11 @@ public class SmppSettingsDaoImpl implements SmppSettingsDao{
 		return (SmppSettings) sessionFactory.getCurrentSession().createQuery("from SmppSettings where active=1 and id = ?").setLong(0, id).list().get(0);
 	}
 
-	
+	@Override
+	public void changeSpeed(Long id, int speed){
+		Query q = (Query) sessionFactory.getCurrentSession().createQuery("update SmppSettings set maxMessagesLimitForSysId = :maxMessagesLimitForSysId where id = :id");
+		q.setLong("id", id);
+		q.setInteger("maxMessagesLimitForSysId", speed);
+		q.executeUpdate();
+	}
 }

@@ -50,6 +50,7 @@ public class UploadMSISDNController {
 			@RequestParam("message") String message, 
 			@RequestParam("campName") String campName,
 			@RequestParam("sourceAddress") String sourceAddress,
+			@RequestParam("validityPeriod") String validityPeriod,
 			Model model) {
 		
 		
@@ -65,7 +66,8 @@ public class UploadMSISDNController {
 				String str = null;
 				
 				while((str = reader.readLine()) != null){
-					msisdnList.add(new MsisdnList(str.trim(), camp));
+//					msisdnList.add(new MsisdnList(str.trim(), camp));
+					msisdnList.add(new MsisdnList(str.trim(), camp, validityPeriod));
 				}
 				
 				campaign.save(camp);

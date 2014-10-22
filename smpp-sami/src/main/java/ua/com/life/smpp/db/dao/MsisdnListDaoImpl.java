@@ -9,6 +9,8 @@ import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +52,7 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	}
 
 	@Override
-	public synchronized List<MsisdnList> getByMsisdnByStatus(Integer status) {
+	public List<MsisdnList> getByMsisdnByStatus(Integer status) {
 		List<MsisdnList> list;
 		
 		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList where status = :status");
@@ -61,10 +63,11 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	}
 	
 	@Override
-	public synchronized List<MsisdnList> getByMsisdnByStatus(Integer status, int limit) {
+	public List<MsisdnList> getByMsisdnByStatus(Integer status, int limit) {
 		List<MsisdnList> list;
 		
-		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList m where status = :status").setMaxResults(limit);
+		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList m where status = :status").setMaxResults(limit).setLockMode("m", LockMode.PESSIMISTIC_READ);
+//		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList m where status = :status").setMaxResults(limit);
 		q.setInteger("status", status);
 		list = q.list();
 		
@@ -74,7 +77,13 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 		
 	}
 
-	private synchronized void updateSendedToSmsc(List<MsisdnList> msisdnId) {
+	@Override
+	public void deleteMsisdnsByCampaignId(Long campaignId){
+		Query q = (Query) sessionFactory.getCurrentSession().createSQLQuery("delete from msisdn_list where campaign_id = :campaignId").setLong("campaignId", campaignId);
+		q.executeUpdate();
+	}
+	
+	private void updateSendedToSmsc(List<MsisdnList> msisdnId) {
 		if(msisdnId.size()!=0){
 			
 			String ids = "";
@@ -120,7 +129,7 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 		Integer totalCount = null;
 		Criteria c = (Criteria) sessionFactory.getCurrentSession().createCriteria(MsisdnList.class)
 				.add(Restrictions.eq("campaign",sessionFactory.getCurrentSession().load(Campaign.class, campaignId)))
-				.add(Restrictions.eq("status", 1))
+				.add(Restrictions.not(Restrictions.eq("status", 0)))
 				.setProjection(Projections.rowCount());
 		
 		totalCount = Integer.parseInt(c.list().get(0).toString());
@@ -154,10 +163,10 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	@Override
 	public String messageStatusByCampaignIdInJson(Long campaignId){
 		String jsonResult = "{}";
-		Query total = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*)from msisdn_list where campaign_id = :campaignId").setLong("campaignId", campaignId);
-		Query sending = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*)from msisdn_list where status = 1 and campaign_id = :campaignId").setLong("campaignId", campaignId);
-		Query success = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*)from msisdn_list where status = 7 and campaign_id = :campaignId").setLong("campaignId", campaignId);
-		Query unsuccess = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*)from msisdn_list where status = -1 and campaign_id = :campaignId").setLong("campaignId", campaignId);
+		Query total = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where campaign_id = :campaignId").setLong("campaignId", campaignId);
+		Query sending = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where status != 0  and campaign_id = :campaignId").setLong("campaignId", campaignId);
+		Query success = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where status = 7 and campaign_id = :campaignId").setLong("campaignId", campaignId);
+		Query unsuccess = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where status = -1 and campaign_id = :campaignId").setLong("campaignId", campaignId);
 
 		jsonResult = "{ \"total\" : "+(String) total.list().get(0).toString()+", \"sending\" : "+(String) sending.list().get(0).toString()+", "
 				+ "\"success\" :  "+(String) success.list().get(0).toString()+", \"unsuccess\" : "+(String) unsuccess.list().get(0).toString()+" }";

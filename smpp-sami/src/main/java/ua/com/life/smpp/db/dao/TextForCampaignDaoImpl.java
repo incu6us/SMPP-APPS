@@ -48,5 +48,10 @@ public class TextForCampaignDaoImpl implements TextForCampaignDao {
 	public void save(TextForCampaign compaignText) {
 		sessionFactory.getCurrentSession().save(compaignText);
 	}
+	
+	@Override
+	public void deleteTextByCampaignId(Long campaignId){
+		sessionFactory.getCurrentSession().createSQLQuery("delete from campaign_text where campaign_id = :campaignId").setLong("campaignId", campaignId).executeUpdate();
+	}
 
 }

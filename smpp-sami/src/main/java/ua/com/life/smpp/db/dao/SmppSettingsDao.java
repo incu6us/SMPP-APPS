@@ -13,4 +13,5 @@ public interface SmppSettingsDao {
 	public SmppSettings getActiveAccount(Long id);
 	public List<SmppSettings> getInactiveAccounts();
 	public void makeActiveInactiveAccount(Long id, int state);
+	public void changeSpeed(Long id, int speed);
 }

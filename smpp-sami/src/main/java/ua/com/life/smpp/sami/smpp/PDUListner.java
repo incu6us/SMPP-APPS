@@ -41,7 +41,8 @@ public class PDUListner implements ServerPDUEventListener {
 		
 		PDU pdu = event.getPDU();
 
-        if (pdu.isValid() && pdu.isRequest()) {
+//        if (pdu.isValid() && pdu.isRequest()) {
+		if (pdu.isRequest()) {
             Response response = ((Request) pdu).getResponse();
 
             try {

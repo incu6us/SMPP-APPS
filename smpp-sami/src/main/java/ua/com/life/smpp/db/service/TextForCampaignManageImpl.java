@@ -41,4 +41,8 @@ public class TextForCampaignManageImpl implements TextForCampaignManage {
 		text.save(compaignText);
 	}
 
+	@Override
+	public void deleteTextByCampaignId(Long campaignId){
+		text.deleteTextByCampaignId(campaignId);
+	}
 }

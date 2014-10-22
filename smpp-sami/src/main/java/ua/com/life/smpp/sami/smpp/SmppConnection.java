@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.hibernate.ejb.criteria.predicate.IsEmptyPredicate;
 import org.omg.CORBA.REBIND;
 import org.smpp.Data;
 import org.smpp.ServerPDUEventListener;
@@ -44,9 +45,9 @@ import ua.com.life.smpp.db.service.TextForCampaignManage;
 
 public class SmppConnection {
 
-	private volatile static int enquireLinkTimeout = 5000;
-	private static int maxMessagesLimitPerSysId = 100;
-
+	private volatile static int enquireLinkTimeout = 60000;
+//	private static int maxMessagesLimitPerSysId = 100;
+	
 	private static Logger LOGGER = Logger.getLogger(SmppConnection.class);
 
 	/**
@@ -103,6 +104,9 @@ public class SmppConnection {
 	 * messages. Note, that if you bind as receiver you can still receive
 	 * responses to you requests (submissions).
 	 */
+	
+	private int maxMessagesLimitForSysId;
+
 	String bindOption = "tr";
 	/**
 	 * The range of addresses the smpp session will serve.
@@ -117,7 +121,7 @@ public class SmppConnection {
 	Address sourceAddress = new Address();
 	Address destAddress = new Address();
 	String scheduleDeliveryTime = "";
-	String validityPeriod = "";
+//	String validityPeriod = "";
 	String shortMessage = "";
 	int numberOfDestination = 1;
 	String messageId = "";
@@ -141,13 +145,14 @@ public class SmppConnection {
 	 * @throws IOException
 	 */
 
-	public SmppConnection(String sessName, String systemId, String password, String ipAddress, int port) {
+	public SmppConnection(String sessName, String systemId, String password, String ipAddress, int port, int maxMessagesLimitForSysId) {
 		this.sessName = sessName;
 		this.systemId = systemId;
 		this.password = password;
 		this.ipAddress = ipAddress;
 		this.port = port;
-
+		this.maxMessagesLimitForSysId = maxMessagesLimitForSysId;
+		
 		try {
 			loadProperties(propsFilePath);
 		} catch (IOException e) {
@@ -176,6 +181,7 @@ public class SmppConnection {
 		this.password = settings.getPassword();
 		this.ipAddress = settings.getHost();
 		this.port = settings.getPort();
+		this.maxMessagesLimitForSysId = settings.getMaxMessagesLimitForSysId();
 
 		try {
 			loadProperties(propsFilePath);
@@ -341,7 +347,7 @@ public class SmppConnection {
 	 * @see SubmitSM
 	 * @see SubmitSMResp
 	 */
-	public void submit(String destAddress, String shortMessage, String sender) {
+	public void submit(String destAddress, String shortMessage, String sender, String validityPeriod) {
 		byte senderTon = 0;
 		byte senderNpi = 0;
 
@@ -545,11 +551,12 @@ public class SmppConnection {
 				String msisdnOrigNum = null;
 				String message = null;
 				String sourceAddr = null;
+				String validityPeriod = null;
 				List<MsisdnList> msisdnList = null;
 
 				while (true) {
 
-					msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitPerSysId);
+					msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitForSysId);
 					
 					if(msisdnList.size() == 0){
 						
@@ -592,9 +599,10 @@ public class SmppConnection {
 							msisdnOrigNum = num.getMsisdn();
 							message = text.getTextForCampaignByCompaignId(num.getCampaign().getCampaignId()).getText();
 							sourceAddr = num.getCampaign().getSourceAddr();
+							validityPeriod = num.getValidityPeriod();
 	
 							System.out.println("--->>> Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
-							submit(msisdnOrigNum, message, sourceAddr);
+							submit(msisdnOrigNum, message, sourceAddr, validityPeriod);
 							
 						}
 

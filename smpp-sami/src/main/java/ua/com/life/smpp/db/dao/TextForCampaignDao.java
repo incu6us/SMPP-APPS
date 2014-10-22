@@ -9,5 +9,6 @@ public interface TextForCampaignDao {
 	public TextForCampaign getTextForCampaignByCompaignId(Long campaignId);
 	public TextForCampaign getTextForCampaignByCompaignName(String campaignName);
 	public List<TextForCampaign> getAllTexts();
-	public void save(TextForCampaign compaignText);	
+	public void save(TextForCampaign compaignText);
+	public void deleteTextByCampaignId(Long campaignId);
 }
