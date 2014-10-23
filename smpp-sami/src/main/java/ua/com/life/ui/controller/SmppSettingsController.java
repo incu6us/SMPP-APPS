@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import ua.com.life.smpp.db.domain.SmppSettings;
 import ua.com.life.smpp.db.service.SmppManage;
+import ua.com.life.smpp.sami.smpp.SmppConnection;
 
 
 @Controller
@@ -46,6 +47,11 @@ public class SmppSettingsController {
 		
 		smppSettings.addSmppAccount(new SmppSettings(systemId, systemId, passwd, host, port, active, speed));
 		
+		SmppSettings smppAccount = smppSettings.getSettingsById(smppSettings.getSettingsByName(systemId).getId());
+		
+		SmppConnection connection = new SmppConnection(smppAccount);
+		connection.run();
+		
 		return "redirect:/smpp_settings";
 	}
 	
@@ -62,12 +68,11 @@ public class SmppSettingsController {
 	public String viewForChangeSystemId(Model model,
 			@RequestParam("id") Long id){
 		
+		List<SmppSettings> smpp = smppSettings.getAllSettings();
+
 		model.addAttribute("pageName", "smppSettings");
 		model.addAttribute("pageSubName", "changeSystemId");
 		model.addAttribute("smppSetting", smppSettings.getSettingsById(id));
-		
-		List<SmppSettings> smpp = smppSettings.getAllSettings();
-		
 		model.addAttribute("smppSettings", smpp);
 		
 		return "index";
@@ -83,15 +88,23 @@ public class SmppSettingsController {
 			@RequestParam("active") int active,
 			@RequestParam("speed") int speed){
 		
+		int oldActiveStatus = smppSettings.getSettingsById(id).getActive();
 		smppSettings.changeSystemIdById(id, systemId, passwd, host, port, active, speed);
-		
+
+		List<SmppSettings> smpp = smppSettings.getAllSettings();
+
 		model.addAttribute("pageName", "smppSettings");
 		model.addAttribute("pageSubName", "changeSystemId");
 		model.addAttribute("smppSetting", smppSettings.getSettingsById(id));
-		
-		List<SmppSettings> smpp = smppSettings.getAllSettings();
-		
 		model.addAttribute("smppSettings", smpp);
+		
+		if(active == 1 && oldActiveStatus == 0){
+			
+			SmppSettings smppAccount = smppSettings.getSettingsById(id);
+			
+			SmppConnection connection = new SmppConnection(smppAccount);
+			connection.run();		
+		}
 		
 		return "index";
 	}

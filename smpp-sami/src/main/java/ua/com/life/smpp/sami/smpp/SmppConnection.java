@@ -95,7 +95,14 @@ public class SmppConnection {
 	 */
 	
 	private int maxMessagesLimitForSysId;
+	
+	ApplicationContext ctx = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/manual-context.xml");
 
+	SmppManage smppSettings = (SmppManage) ctx.getBean("smppManageImpl");
+//	CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
+	MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+	TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
+	
 	String bindOption = "tr";
 	/**
 	 * The range of addresses the smpp session will serve.
@@ -154,6 +161,11 @@ public class SmppConnection {
 
 	public void setBound(boolean bound) {
 		this.bound = bound;
+		if(bound){
+			smppSettings.changeConnectionState(smppSettings.getSettingsByName(sessName).getId(), 1);
+		}else{
+			smppSettings.changeConnectionState(smppSettings.getSettingsByName(sessName).getId(), 0);
+		}
 	}
 
 	public boolean getBound() {
@@ -524,12 +536,6 @@ public class SmppConnection {
 
 	public void run() {
 		Runnable run = new Runnable() {
-			ApplicationContext ctx = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/manual-context.xml");
-
-			SmppManage smppSettings = (SmppManage) ctx.getBean("smppManageImpl");
-//			CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
-			MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
-			TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
 
 			@Override
 			public void run() {
@@ -570,7 +576,7 @@ public class SmppConnection {
 									e1.printStackTrace();
 								}
 							}
-						}
+						} 
 						
 						// Timeout for EnquireLink
 						try {
@@ -611,31 +617,53 @@ public class SmppConnection {
 						}
 					}
 					
-					Long newSmppSettingVersion = smppSettings.getSettingsByName(sessName).getVersion();
+					Long newSmppSettingVersion = new Long(-1);
+					
+					try{
+						newSmppSettingVersion = smppSettings.getSettingsByName(sessName).getVersion();
+					}catch(IndexOutOfBoundsException e){
+						
+						closeSmppConnection();
+						break;
+					}
+					
 					if(oldSmppSettingVersion != newSmppSettingVersion){
-						
-						unbind();
-						
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						if(smppSettings.getSettingsByName(sessName).getActive() != 1){
+							unbind();
+							
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							closeSmppConnection();
+							break;
+							
+						}else{
+							unbind();
+							
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							SmppSettings smppSetting = smppSettings.getSettingsByName(sessName);
+							new SmppConnection(smppSetting);
+							oldSmppSettingVersion = newSmppSettingVersion;
+							
+							bind();
+							
+							try {
+								Thread.sleep(5000);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
-						
-						SmppSettings smppSetting = smppSettings.getSettingsByName(sessName);
-						new SmppConnection(smppSetting);
-						oldSmppSettingVersion = newSmppSettingVersion;
-						
-						bind();
-						
-						try {
-							Thread.sleep(5000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
 					}
 				}
 			}
@@ -646,5 +674,15 @@ public class SmppConnection {
 		t.start();
 
 	}
+	
 
+	private void closeSmppConnection(){
+		try {
+			session.close();
+		} catch (WrongSessionStateException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Thread.currentThread().interrupt();
+	}
 }

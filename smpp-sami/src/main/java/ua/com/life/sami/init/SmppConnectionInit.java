@@ -51,6 +51,10 @@ public class SmppConnectionInit {
 
 		Thread.sleep(1000);
 		
+		for(SmppSettings smpp : smppSettings.getAllSettings()){
+			smppSettings.changeConnectionState(smpp.getId(), 0);
+		}
+		
 		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
 			System.out.println("---- Started sysid: " + smpp.getName());
 

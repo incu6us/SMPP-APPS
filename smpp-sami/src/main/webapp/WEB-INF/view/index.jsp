@@ -56,6 +56,38 @@ function len_display(Object,MaxLen,element){
 	});
 	</script>
 </c:if>
+
+<c:if test="${pageName == 'smppSettings'}">
+<script type="text/javascript">
+$(document).ready(function(){
+	var interval = 5000;   //number of mili seconds between each call
+    var refresh = function() {
+        $.ajax({
+            url: "<c:url value='/rest/getSystemIdConnectionStatus/all'></c:url>",
+            type: 'GET',
+            cache: false,
+            dataType: 'json',
+            success: function(html) {
+                $.each(html, function(index, value){
+                	if(value == 'connected'){
+                		$('#smppConnectionStatus-'+index).html('<span class="label label-success label-xs">'+value+'</span>');
+                	}else{
+                		$('#smppConnectionStatus-'+index).html('<span class="label label-danger label-xs">'+value+'</span>');
+                	}
+                	console.debug('smppConnectionStatus-'+index+" "+value);
+                });
+                setTimeout(function() {
+                    refresh();
+                    console.debug(JSON.stringify(html));
+                }, interval);
+            }
+        });
+    };
+    refresh();
+});
+</script>
+</c:if>
+
 </head>
 <body>
 	<div>

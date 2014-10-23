@@ -12,7 +12,7 @@
 	
 	<br>
 	
-	<table class="table table-striped table-bordered">
+	<table class="table table-striped table-bordered table-hover" style="background-color: #dff0d8">
 		<th><center>
 				<b>#</b>
 			</center></th>

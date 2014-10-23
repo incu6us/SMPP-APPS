@@ -100,6 +100,11 @@
 						</fieldset>
 					</form>
 				</c:if> <c:if test="${pageSubName == 'changeSystemId'}">
+				
+					<c:if test="${smppSetting.active == 1}" >
+						<c:set var="read" value='readonly="readonly"'></c:set>
+					</c:if>
+				
 					<form class="form-horizontal" method="post"
 						action='<c:url value="/smpp_settings/change_sysid"></c:url>'
 						style="background-color: #fff; padding: 10px 10px 10px 10px">
@@ -115,7 +120,7 @@
 								<div class="col-md-4">
 									<input id="systemId" name="systemId" type="text"
 										placeholder="system_id" class="form-control input-md"
-										required="" value="${smppSetting.systemId}">
+										required="" value="${smppSetting.systemId}" readonly="readonly">
 
 								</div>
 							</div>
@@ -126,7 +131,7 @@
 								<div class="col-md-4">
 									<input id="passwd" name="passwd" type="text"
 										placeholder="password" class="form-control input-md"
-										required="" value="${smppSetting.password}">
+										required="" value="${smppSetting.password}" ${read}>
 
 								</div>
 							</div>
@@ -137,7 +142,7 @@
 									Address</label>
 								<div class="col-md-4">
 									<input id="host" name="host" type="text" placeholder="0.0.0.0"
-										class="form-control input-md" required="" value="${smppSetting.host}">
+										class="form-control input-md" required="" value="${smppSetting.host}" ${read}>
 
 								</div>
 							</div>
@@ -147,7 +152,7 @@
 								<label class="col-md-4 control-label" for="port">Port</label>
 								<div class="col-md-4">
 									<input id="port" name="port" type="text" placeholder="16000"
-										class="form-control input-md" required="" value="${smppSetting.port}">
+										class="form-control input-md" required="" value="${smppSetting.port}" ${read}>
 
 								</div>
 							</div>
@@ -174,7 +179,7 @@
 								<label class="col-md-4 control-label" for="speed">Speed</label>
 								<div class="col-md-4">
 									<input id="speed" name="speed" type="text" placeholder="50"
-										class="form-control input-md" required="" value="${smppSetting.maxMessagesLimitForSysId}">
+										class="form-control input-md" required="" value="${smppSetting.maxMessagesLimitForSysId}" ${read}>
 
 								</div>
 							</div>
@@ -184,7 +189,7 @@
 								<label class="col-md-4 control-label" for="submit"></label>
 								<div class="col-md-4">
 									<button id="submit" name="submit" type="submit"
-										class="btn btn-default">Change</button>
+										class="btn btn-default">Apply</button>
 								</div>
 							</div>
 
@@ -193,12 +198,13 @@
 					</form>
 				</c:if></td>
 			<td valign="top">
-				<table class="table"
+				<table class="table table-hover"
 					style="width: 400px; background-color: #fff; margin-left: 60px;">
 					<th><center>#</center></th>
 					<th><center>System Id</center></th>
 					<th><center>Host</center></th>
 					<th><center>Status</center></th>
+					<th><center>Connection</center></th>
 					<th><center>Speed</center></th>
 					<th></th>
 					<th></th>
@@ -208,10 +214,16 @@
 							<td>${smppSetting.systemId}</td>
 							<td>${smppSetting.host}:${smppSetting.port}</td>
 							<c:if test="${smppSetting.active == '1'}">
-								<td><span class="label label-success label-xs">active</span></td>
+								<td><center><span class="label label-success label-xs">active</span></center></td>
 							</c:if>
 							<c:if test="${smppSetting.active != '1'}">
-								<td><span class="label label-danger label-xs">inactive</span></td>
+								<td><center><span class="label label-danger label-xs">inactive</span></center></td>
+							</c:if>
+							<c:if test="${smppSetting.connection == '1'}">
+								<td><center id="smppConnectionStatus-${smppSetting.systemId}"><span class="label label-success label-xs">connected</span></center></td>
+							</c:if>
+							<c:if test="${smppSetting.connection != '1'}">
+								<td><center id="smppConnectionStatus-${smppSetting.systemId}"><span class="label label-danger label-xs">disconnectd</span></center></td>
 							</c:if>
 							<td>${smppSetting.maxMessagesLimitForSysId}</td>
 							<td><center>

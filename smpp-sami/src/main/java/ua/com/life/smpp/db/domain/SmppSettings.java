@@ -36,6 +36,9 @@ public class SmppSettings {
 	@Column(name="active", length=1)
 	private int active;
 	
+	@Column(name="connection", length=1)
+	private int connection = 0;
+	
 	@Column(name="speed", length=5)
 	private int maxMessagesLimitForSysId;
 	
@@ -135,6 +138,14 @@ public class SmppSettings {
 		this.active = active;
 	}
 
+	public int getConnection() {
+		return connection;
+	}
+
+	public void setConnection(int connection) {
+		this.connection = connection;
+	}
+
 	public int getMaxMessagesLimitForSysId() {
 		return maxMessagesLimitForSysId;
 	}
@@ -150,5 +161,5 @@ public class SmppSettings {
 	public void setVersion(Long version) {
 		this.version = version;
 	}
-	
+
 }

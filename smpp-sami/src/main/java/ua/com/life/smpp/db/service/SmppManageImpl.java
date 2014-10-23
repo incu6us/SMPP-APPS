@@ -70,5 +70,10 @@ public class SmppManageImpl implements SmppManage {
 	public void changeSystemIdById(Long id, String systemId, String password, String host, int port, int active, int speed){
 		settingsDao.changeSystemIdById(id, systemId, password, host, port, active, speed);
 	}
+
+	@Transactional
+	public void changeConnectionState(Long id, int connection) {
+		settingsDao.changeConnectionState(id, connection);
+	}
 	
 }
