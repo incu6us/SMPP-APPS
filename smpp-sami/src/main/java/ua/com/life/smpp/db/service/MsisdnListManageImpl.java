@@ -45,6 +45,11 @@ public class MsisdnListManageImpl implements MsisdnListManage {
 	}
 
 	@Transactional
+	public List<MsisdnList> getByMsisdnByStatusForIdSystemId(Integer status, int limit, Long idSystemId){
+		return msisdnListDao.getByMsisdnByStatusForIdSystemId(status, limit, idSystemId);
+	}
+	
+	@Transactional
 	public void deleteMsisdnsByCampaignId(Long campaignId){
 		msisdnListDao.deleteMsisdnsByCampaignId(campaignId);
 	}

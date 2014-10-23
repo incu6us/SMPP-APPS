@@ -553,7 +553,12 @@ public class SmppConnection {
 
 				while (true) {
 
-					msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitForSysId);
+					msisdnList = msisdn.getByMsisdnByStatusForIdSystemId(0, maxMessagesLimitForSysId, smppSettings.getSettingsByName(sessName).getId());
+					
+					if(msisdnList.size() == 0){
+						msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitForSysId);
+					}
+						
 					
 					if(msisdnList.size() == 0){
 						

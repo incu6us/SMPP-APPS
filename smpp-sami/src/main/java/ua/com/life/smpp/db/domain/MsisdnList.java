@@ -43,6 +43,8 @@ public class MsisdnList {
 	@Column(name="smsc_err", length=5)
 	private String smscErr;
 	
+	@Column(name="id_systemid")
+	private Long idSystemId;
 	
 	@ManyToOne
 	@JoinColumn(name="campaign_id")
@@ -65,11 +67,12 @@ public class MsisdnList {
 		this.campaign = camaign;
 	}
 	
-	public MsisdnList(String msisdn, Campaign camaign, String validityPeriod) {
+	public MsisdnList(String msisdn, Campaign camaign, String validityPeriod, Long idSystemId) {
 		this.msisdn = msisdn;
 		this.sendingDate = new Date(System.currentTimeMillis());
 		this.status = 0;
 		this.validityPeriod = validityPeriod;
+		this.idSystemId = idSystemId;
 		this.campaign = camaign;
 	}
 	
@@ -158,6 +161,14 @@ public class MsisdnList {
 
 	public void setValidityPeriod(String validityPeriod) {
 		this.validityPeriod = validityPeriod;
+	}
+
+	public Long getIdSystemId() {
+		return idSystemId;
+	}
+
+	public void setIdSystemId(Long idSystemId) {
+		this.idSystemId = idSystemId;
 	}
 
 }

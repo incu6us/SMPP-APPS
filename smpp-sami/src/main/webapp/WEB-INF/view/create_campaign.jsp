@@ -85,6 +85,27 @@
 		  </div>
 		</div>
 
+		<!-- Multiple Radios -->
+		<div class="form-group">
+		  <label class="col-md-4 control-label" for="radios">SMPP System ID</label>
+		  <div class="col-md-4">
+		  <div class="radio" style="background-color: #fff;">
+		    <label for="radios-0">
+		      <input name="radios" id="radios-0" value="" checked="checked" type="radio">
+		      ALL ACTIVE SYSTEM IDs
+		    </label>
+			</div>
+		  <c:forEach items="${smppSettings}" var="smpp">
+		  <div class="radio" style="background-color: #fff;">
+		    <label for="radios-${smpp.systemId}">
+		      <input name="radios" id="radios-${smpp.systemId}" value="${smpp.id}" type="radio">
+		      ${smpp.systemId}
+		    </label>
+			</div>
+		  </c:forEach>
+		  </div>
+		</div>
+		
 		<!-- File Button -->
 		<div class="form-group">
 			<label class="col-md-4 control-label" for="file">Uploaded
