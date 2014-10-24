@@ -26,6 +26,7 @@ import org.smpp.pdu.WrongLengthOfStringException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import ua.com.life.sami.init.Constants;
 import ua.com.life.smpp.db.domain.MsisdnList;
 import ua.com.life.smpp.db.domain.SmppSettings;
 import ua.com.life.smpp.db.service.MsisdnListManage;
@@ -34,26 +35,14 @@ import ua.com.life.smpp.db.service.TextForCampaignManage;
 
 public class SmppConnection {
 
-	private volatile static int enquireLinkTimeout = 5000;
-//	private static int maxMessagesLimitPerSysId = 100;
-	
 	private static Logger LOGGER = Logger.getLogger(SmppConnection.class);
+	
+	private volatile static int enquireLinkTimeout = Constants.enquireLinkTimeout;
 
 	/**
 	 * File with default settings for the application.
 	 */
-	private static String propsFilePath = "src/main/resources/smppparams.cfg";
-	// static String propsFilePath = "smppparams.cfg";
-	// {
-	// try {
-	// System.out.println("Absolute path path: "+new
-	// File(".").getCanonicalPath());
-	// LOGGER.info("Cannonical path: "+ new File(".").getCanonicalPath());
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// }
+	private static String propsFilePath = Constants.propsFilePath;
 	
 	/**
 	 * This is the SMPP session used for communication with SMSC.
@@ -96,10 +85,9 @@ public class SmppConnection {
 	
 	private int maxMessagesLimitForSysId;
 	
-	ApplicationContext ctx = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/manual-context.xml");
+	ApplicationContext ctx = new FileSystemXmlApplicationContext(Constants.manualContext);
 
 	SmppManage smppSettings = (SmppManage) ctx.getBean("smppManageImpl");
-//	CampaignManage campaign = (CampaignManage) ctx.getBean("campaignManageImpl");
 	MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
 	TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
 	
@@ -117,7 +105,6 @@ public class SmppConnection {
 	Address sourceAddress = new Address();
 	Address destAddress = new Address();
 	String scheduleDeliveryTime = "";
-//	String validityPeriod = "";
 	String shortMessage = "";
 	int numberOfDestination = 1;
 	String messageId = "";
@@ -128,6 +115,7 @@ public class SmppConnection {
 	byte replaceIfPresentFlag = 0;
 	byte dataCoding = 0x08;
 	byte smDefaultMsgId = 0;
+	
 	/**
 	 * If you attemt to receive message, how long will the application wait for
 	 * data.
@@ -233,10 +221,8 @@ public class SmppConnection {
 		try {
 			BindRequest request = null;
 			BindResponse response = null;
-			// request = new BindTransmitter();
 			request = new BindTransciever();
 			TCPIPConnection connection = new TCPIPConnection(ipAddress, port);
-			// connection.setReceiveTimeout(20 * 1000);
 			session = new Session(connection);
 			pduListener = new PDUListner(session);
 			// set values
@@ -246,16 +232,20 @@ public class SmppConnection {
 			request.setInterfaceVersion((byte) 0x34);
 			request.setAddressRange(addressRange);
 			// send the request
-			System.out.println("Bind request " + request.debugString());
+//			System.out.println("Bind request " + request.debugString());
+			LOGGER.debug("Bind request " + request.debugString());
+			
 			response = session.bind(request, pduListener);
 
 			Thread.sleep(1000);
 
-			System.out.println("Bind response " + response.debugString());
+//			System.out.println("Bind response " + response.debugString());
+			LOGGER.debug("Bind response " + response.debugString());
 			if (response.getCommandStatus() == Data.ESME_ROK) {
 				setBound(true);
 			} else {
-				System.out.println("Bind failed for " + this.sessName + ", code " + response.getCommandStatus());
+//				System.out.println("Bind failed for " + this.sessName + ", code " + response.getCommandStatus());
+				LOGGER.debug("Bind failed for " + this.sessName + ", code " + response.getCommandStatus());
 				while (!isBound()) {
 					bind();
 					Thread.sleep(5000);
@@ -263,14 +253,13 @@ public class SmppConnection {
 			}
 
 		} catch (Exception e) {
-			System.out.println("Bind operation failed. " + e);
+//			System.out.println("Bind operation failed. " + e);
 			LOGGER.error("Bind operation failed. " + this.sessName + ": " + e);
 			while (!isBound()) {
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					LOGGER.warn("Thread interrupted: "+e1);
 				}
 				bind();
 			}
@@ -309,30 +298,31 @@ public class SmppConnection {
 		try {
 
 			if (!isBound()) {
-				System.out.println("Not bound, cannot unbind: " + sessName);
+//				System.out.println("Not bound, cannot unbind: " + sessName);
+				LOGGER.warn("Not bound, cannot unbind: " + sessName);
 				return;
 			}
 			
 			// send the request
-			System.out.println("Going to unbind.");
+//			System.out.println("Going to unbind.");
+			LOGGER.info("Going to unbind.");
 			if (session.getReceiver().isReceiver()) {
-				System.out.println("It can take a while to stop the receiver.");
+//				System.out.println("It can take a while to stop the receiver.");
+				LOGGER.info("It can take a while to stop the receiver.");
 			}
-			// enquireLinkThread.stop();
-			// pduReceiver.stop();
 			UnbindResp response = session.unbind();
 			session.close();
-			System.out.println("Unbind response " + response.debugString());
+//			System.out.println("Unbind response " + response.debugString());
+			LOGGER.info("Unbind response " + response.debugString());
 			setBound(false);
 		} catch (Exception e) {
-			System.out.println("Unbind operation failed. " + e);
+//			System.out.println("Unbind operation failed. " + e);
 			LOGGER.warn("Unbind operation failed. " + sessName + ": " + e);
 			try {
 				setBound(false);
 				session.close();
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOGGER.warn("Unbind failed: "+e1);
 			}
 			setBound(false);
 		}
@@ -397,14 +387,8 @@ public class SmppConnection {
 			// send the request
 			request.assignSequenceNumber(true);
 			session.submit(request);
-			// System.out.println("Submit request: " + request.debugString());
-			// response = session.submit(request);
-			// System.out.println("Submit response " + response.debugString());
-			// messageId = response.getMessageId();
-			// System.out.println("MessageID: "+messageId);
-			// LOGGER.info("Response ---> messageId: "+messageId+" was sent.");
 		} catch (Exception e) {
-			System.out.println("Submit operation failed. " + e);
+//			System.out.println("Submit operation failed. " + e);
 			LOGGER.error("Submit operation failed. " + e);
 			if (!isBound() || !session.isOpened()) {
 				setBound(false);
@@ -413,7 +397,7 @@ public class SmppConnection {
 					Thread.sleep(2000);
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					LOGGER.error("Interruption thread: "+e1);
 				}
 			}
 			// submit(destAddress, shortMessage, sender);
@@ -437,12 +421,11 @@ public class SmppConnection {
 	 */
 	private void loadProperties(String fileName) throws IOException {
 		System.out.println("Reading configuration file " + fileName + "...");
-		// FileInputStream propsFile = new
-		// FileInputStream("../applications/sami/WEB-INF/classes/"+fileName);
 		FileInputStream propsFile = new FileInputStream(fileName);
 		properties.load(propsFile);
 		propsFile.close();
-		System.out.println("Setting default parameters...");
+//		System.out.println("Setting default parameters...");
+		LOGGER.info("Setting default parameters...");
 		byte ton;
 		byte npi;
 		String addr;
@@ -460,7 +443,7 @@ public class SmppConnection {
 		try {
 			addressRange.setAddressRange(addr);
 		} catch (WrongLengthOfStringException e) {
-			System.out.println("The length of address-range parameter is wrong.");
+//			System.out.println("The length of address-range parameter is wrong.");
 			LOGGER.error("The length of address-range parameter is wrong.");
 		}
 		ton = getByteProperty("source-ton", sourceAddress.getTon());
@@ -481,7 +464,8 @@ public class SmppConnection {
 		} else if (bindMode.equalsIgnoreCase("transciever")) {
 			bindMode = "tr";
 		} else if (!bindMode.equalsIgnoreCase("t") && !bindMode.equalsIgnoreCase("r") && !bindMode.equalsIgnoreCase("tr")) {
-			System.out.println("The value of bind-mode parameter in " + "the configuration file " + fileName + " is wrong. " + "Setting the default");
+//			System.out.println("The value of bind-mode parameter in " + "the configuration file " + fileName + " is wrong. " + "Setting the default");
+			LOGGER.error("The value of bind-mode parameter in " + "the configuration file " + fileName + " is wrong. " + "Setting the default");
 			bindMode = "t";
 		}
 		bindOption = bindMode;
@@ -528,7 +512,7 @@ public class SmppConnection {
 		try {
 			address.setAddress(addr);
 		} catch (WrongLengthOfStringException e) {
-			System.out.println("The length of " + descr + " parameter is wrong.");
+//			System.out.println("The length of " + descr + " parameter is wrong.");
 			LOGGER.error("The length of " + descr + " parameter is wrong.");
 		}
 	}
@@ -554,7 +538,7 @@ public class SmppConnection {
 				while (true) {
 
 					msisdnList = msisdn.getByMsisdnByStatusForIdSystemId(0, maxMessagesLimitForSysId, smppSettings.getSettingsByName(sessName).getId());
-//					
+					
 //					if(msisdnList.size() == 0){
 //						msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitForSysId);
 //					}
@@ -565,10 +549,10 @@ public class SmppConnection {
 						// Send EnquireLink
 						try {
 							session.enquireLink();
-							System.out.println("enquirelink: " + sessName + " " + session);
+//							System.out.println("enquirelink: " + sessName + " " + session);
+							LOGGER.debug("enquirelink: " + sessName + " " + session);
 						} catch (TimeoutException | PDUException | WrongSessionStateException | IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LOGGER.warn("Error happenes while enquirelink sending: "+e);
 							
 							// Rebind if session is closed
 							unbind();
@@ -577,8 +561,7 @@ public class SmppConnection {
 								try {
 									Thread.sleep(5000);
 								} catch (InterruptedException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
+									LOGGER.warn("Interruption thread: "+e1);
 								}
 							}
 						} 
@@ -588,7 +571,7 @@ public class SmppConnection {
 							Thread.sleep(enquireLinkTimeout);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LOGGER.warn("Interruption thread: "+e);
 						}
 	
 					}else{
@@ -604,6 +587,7 @@ public class SmppConnection {
 							validityPeriod = num.getValidityPeriod();
 	
 							System.out.println("--->>> Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
+							LOGGER.debug("--->>> Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
 							submit(msisdnOrigNum, message, sourceAddr, validityPeriod);
 							
 						}
@@ -640,7 +624,7 @@ public class SmppConnection {
 								Thread.sleep(500);
 							} catch (InterruptedException e) {
 								// TODO Auto-generated catch block
-								e.printStackTrace();
+								LOGGER.warn("Interruption exception: "+ e);
 							}
 							
 							closeSmppConnection();
@@ -666,7 +650,7 @@ public class SmppConnection {
 								Thread.sleep(5000);
 							} catch (InterruptedException e) {
 								// TODO Auto-generated catch block
-								e.printStackTrace();
+								LOGGER.warn("Interruption exception: "+ e);
 							}
 						}
 					}
@@ -686,7 +670,7 @@ public class SmppConnection {
 			session.close();
 		} catch (WrongSessionStateException | IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.warn("Interruption exception: "+ e);
 		}
 		Thread.currentThread().interrupt();
 	}

@@ -29,13 +29,7 @@
 				<b>Total Messages:</b>
 			</center></th>
 		<th><center>
-				<b>Sending:</b>
-			</center></th>
-		<th><center>
-				<b>Success Sended:</b>
-			</center></th>
-		<th><center>
-				<b>Unsuccess Messages:</b>
+				<b>Sent Messages:</b>
 			</center></th>
 		<th></th>
 		<c:forEach items="${messageObjects}" var="messageObject" varStatus="rowCounter">
@@ -47,8 +41,6 @@
 				<td>${messageObject.campaignText}</td>
 				<td width="200">${messageObject.totalMessages}</td>
 				<td>${messageObject.inActionMessages}</td>
-				<td>${messageObject.successMessages}</td>
-				<td>${messageObject.unsuccessMessages}</td>
 				<td><center><a href='<c:url value="/stat/delete?campaign_id=${messageObject.campaignId}"></c:url>' type="button" class="btn btn-danger btn-xs">Delete</a></center></td>
 			</tr>
 		</c:forEach>
@@ -63,41 +55,72 @@
 	</center>
 	
 	<br>
-	
-	<table class="table" style="width: 400px; background-color: #fff;">
-		<th><center>Description</center></th>
-		<th><center>Data</center></th>
-		<tr class="info">
-			<td>Campaign ID:</td>
-			<td>${messageObject.campaignId}</td>
-		</tr>
-		<tr class="info">
-			<td>Campaign Name:</td>
-			<td>${messageObject.campaignName}</td>
-		</tr>
-		<tr class="info">
-			<td>Source Address:</td>
-			<td>${messageObject.campaignSourceAddres}</td>
-		</tr>
-		<tr class="info">
-			<td>Message Text:</td>
-			<td>${messageObject.campaignText}</td>
-		</tr>
+	<table>
 		<tr>
-			<td>Total Messages:</td>
-			<td><span id="totalMessages">0</span></td>
-		</tr>
-		<tr>
-			<td>Sending Messages:</td>
-			<td><span id="sendingMessages">0</span></td>
-		</tr>
-		<tr>
-			<td>Success Delivered:</td>
-			<td><span id="successMessages">0</span></td>
-		</tr>
-		<tr>
-			<td>Undelivered Messages:</td>
-			<td><span id="undeliveredMessages">0</span></td>
+			<td valign="top">
+				<table class="table" style="width: 400px; background-color: #fff;">
+					<th><center>Description</center></th>
+					<th><center>Data</center></th>
+					<tr class="info">
+						<td>Campaign ID:</td>
+						<td>${messageObject.campaignId}</td>
+					</tr>
+					<tr class="info">
+						<td>Campaign Name:</td>
+						<td>${messageObject.campaignName}</td>
+					</tr>
+					<tr class="info">
+						<td>Source Address:</td>
+						<td>${messageObject.campaignSourceAddres}</td>
+					</tr>
+					<tr class="info">
+						<td>Message Text:</td>
+						<td>${messageObject.campaignText}</td>
+					</tr>
+					<tr>
+						<td>Total Messages:</td>
+						<td><span id="totalMessages">0</span></td>
+					</tr>
+					<tr>
+						<td>Sent Messages:</td>
+						<td><span id="sentMessages">0</span></td>
+					</tr>
+				</table>
+			</td>
+			<td valign="top">
+				<table class="table table-hover" style="width: 400px; background-color: #fff; margin-left: 40px;">
+					<th><center>Message State</center></th>
+					<th><center>Count</center></th>
+					<tr>
+						<td>Delivered:</td>
+						<td><span id="stateDelivered">0</span></td>
+					</tr>
+					<tr>
+						<td>Expired:</td>
+						<td><span id="stateExpired">0</span></td>
+					</tr>
+					<tr>
+						<td>Deleted:</td>
+						<td><span id="stateDeleted">0</span></td>
+					</tr>
+					<tr>
+						<td>Undeliverable:</td>
+						<td><span id="stateUndeliverable">0</span></td>
+					</tr>
+					<tr>
+						<td>Accepted:</td>
+						<td><span id="stateAccepted">0</span></td>
+					</tr>
+					<tr>
+						<td>Rejected:</td>
+						<td><span id="stateRejected">0</span></td>
+					</tr>
+					<tr>
+						<td>Unknown:</td>
+						<td><span id="stateUnknown">0</span></td>
+					</tr>
+				</table>
+			</td>
 		</tr>
 	</table>
 	<br>

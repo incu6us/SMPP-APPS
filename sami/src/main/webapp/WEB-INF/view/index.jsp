@@ -42,9 +42,15 @@ function len_display(Object,MaxLen,element){
 	            dataType: 'json',
 	            success: function(html) {
 	                $('#totalMessages').html(JSON.stringify(html['total']));
-	                $('#sendingMessages').html(JSON.stringify(html['sending']));
-	                $('#successMessages').html(JSON.stringify(html['success']));
-	                $('#undeliveredMessages').html(JSON.stringify(html['unsuccess']));
+	                $('#sentMessages').html(JSON.stringify(html['sent']));
+	                
+	                $('#stateDelivered').html(JSON.stringify(html['delivered']));
+	                $('#stateExpired').html(JSON.stringify(html['expired']));
+	                $('#stateDeleted').html(JSON.stringify(html['deleted']));
+	                $('#stateUndeliverable').html(JSON.stringify(html['undeliverable']));
+	                $('#stateAccepted').html(JSON.stringify(html['accepted']));
+	                $('#stateRejected').html(JSON.stringify(html['rejected']));
+	                $('#stateUnknown').html(JSON.stringify(html['unknown']));
 	                setTimeout(function() {
 	                    refresh();
 	                    console.debug(JSON.stringify(html));

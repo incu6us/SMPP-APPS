@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
 import org.hibernate.id.IntegralDataTypeHolder;
 import org.smpp.ServerPDUEvent;
 import org.smpp.ServerPDUEventListener;
@@ -20,12 +21,15 @@ import org.smpp.pdu.Response;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import ua.com.life.sami.init.Constants;
 import ua.com.life.smpp.db.service.CampaignManage;
 import ua.com.life.smpp.db.service.MsisdnListManage;
 import ua.com.life.smpp.db.service.TextForCampaignManage;
 
 public class PDUListner implements ServerPDUEventListener {
 
+	private static Logger LOGGER = Logger.getLogger(PDUListner.class); 
+	
 	private Session session = null;
 	private ApplicationContext ctx;
 	
@@ -35,7 +39,7 @@ public class PDUListner implements ServerPDUEventListener {
 	
 	@Override
 	public void handleEvent(ServerPDUEvent event) {
-		ctx = new FileSystemXmlApplicationContext("src/main/webapp/WEB-INF/manual-context.xml");
+		ctx = new FileSystemXmlApplicationContext(Constants.manualContext);
 
 		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
 		
@@ -58,7 +62,11 @@ public class PDUListner implements ServerPDUEventListener {
                 System.out.println("Source address: " + deliverSM.getSourceAddr().getAddress());
                 System.out.println("SMS length: " + deliverSM.getSmLength());
                 System.out.println("SMS: " + deliverSM.getShortMessage());
-
+                LOGGER.debug("Destination address: " + deliverSM.getDestAddr().getAddress());
+                LOGGER.debug("Source address: " + deliverSM.getSourceAddr().getAddress());
+                LOGGER.debug("SMS length: " + deliverSM.getSmLength());
+                LOGGER.debug("SMS: " + deliverSM.getShortMessage());
+                
                 Map<String, String> parsedMessage = parseShortMessage(deliverSM.getShortMessage());
                 
                 SimpleDateFormat dateFormat = new SimpleDateFormat();
@@ -70,8 +78,18 @@ public class PDUListner implements ServerPDUEventListener {
                 String status = parsedMessage.get("stat").trim();
                 String err = parsedMessage.get("err").trim();
                 
-                if(status.equals("DELIVRD")){
+                if(status.equals(Constants.statusDelivered)){
                 	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 7, err);
+                }else if(status.equals(Constants.statusExpired)){
+                	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 6, err);
+                }else if(status.equals(Constants.statusDeleted)){
+                	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 5, err);
+                }else if(status.equals(Constants.statusUndeliverable)){
+                	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 4, err);
+                }else if(status.equals(Constants.statusAccepted)){
+                	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 3, err);
+                }else if(status.equals(Constants.statusRejected)){
+                	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 2, err);
                 }else{
                 	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, -1, err);
                 }

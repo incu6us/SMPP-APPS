@@ -1,26 +1,24 @@
 package ua.com.life.smpp.db.dao;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import ua.com.life.smpp.db.domain.Campaign;
 import ua.com.life.smpp.db.domain.MsisdnList;
 import ua.com.life.smpp.db.domain.SmppSettings;
-import ua.com.life.smpp.db.domain.TextForCampaign;
+import ua.com.life.smpp.sami.message.MessagesStatusFromDeliveryReport;
 
 @Repository
 public class MsisdnListDaoImpl implements MsisdnListDao {
@@ -115,18 +113,26 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	
 	@Override
 	public void acceptDeliveryReport(String msisdn, String messageId, Date submitDate, Date doneDate, Integer status, String err) {
-		Query q = sessionFactory.getCurrentSession().createQuery("from MsisdnList where msisdn = :msisdn and status=1");
+//		Query q = sessionFactory.getCurrentSession().createQuery("from MsisdnList where msisdn = :msisdn and status=1");
+		Query q = sessionFactory.getCurrentSession().createSQLQuery("update msisdn_list set submit_date = :deliveryDateSMSC, done_date = :readingDate,"
+				+ " status = :status, smsc_err = :err where msisdn = :msisdn and (message_id = :messageId or (status=1 and message_id is null))");
 		q.setString("msisdn", msisdn);
+		q.setString("messageId", messageId);
+		q.setDate("deliveryDateSMSC", submitDate);
+		q.setDate("readingDate", doneDate);
+		q.setInteger("status", status);
+		q.setString("err", err);
+		q.executeUpdate();
 		
-		List<MsisdnList> msisdns = (List<MsisdnList>) q.list();
-		
-		for(MsisdnList m : msisdns){
-			m.setDeliveryDateSMSC(submitDate);
-			m.setReadingDate(doneDate);
-			m.setStatus(status);
-			m.setMessageId(messageId);
-			m.setSmscErr(err);
-		}
+//		List<MsisdnList> msisdns = q.list();
+//		
+//		for(MsisdnList m : msisdns){
+//			m.setDeliveryDateSMSC(submitDate);
+//			m.setReadingDate(doneDate);
+//			m.setStatus(status);
+//			m.setMessageId(messageId);
+//			m.setSmscErr(err);
+//		}
 	}
 	
 	@Override
@@ -178,14 +184,47 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	
 	@Override
 	public String messageStatusByCampaignIdInJson(Long campaignId){
-		String jsonResult = "{}";
-		Query total = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where campaign_id = :campaignId").setLong("campaignId", campaignId);
-		Query sending = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where status != 0  and campaign_id = :campaignId").setLong("campaignId", campaignId);
-		Query success = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where status = 7 and campaign_id = :campaignId").setLong("campaignId", campaignId);
-		Query unsuccess = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where status = -1 and campaign_id = :campaignId").setLong("campaignId", campaignId);
-
-		jsonResult = "{ \"total\" : "+(String) total.list().get(0).toString()+", \"sending\" : "+(String) sending.list().get(0).toString()+", "
-				+ "\"success\" :  "+(String) success.list().get(0).toString()+", \"unsuccess\" : "+(String) unsuccess.list().get(0).toString()+" }";
+		String jsonResult = "";
+		String total = "0";
+		BigInteger sent = new BigInteger("0");
+		
+		Query qTotal = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where campaign_id = :campaignId").setLong("campaignId", campaignId);
+		
+		Query q = (Query) sessionFactory.getCurrentSession().createSQLQuery("select status, count(*) as count from msisdn_list "
+				+ "where status=7 or status = 6 or status = 5 or status = 4 or status = 3 or status = 2 or status = -1 or status = 1 group by status;");
+		
+		List<Object[]> states = (List<Object[]>) q.list();
+		
+		jsonResult = "{ ";
+		for(Object[] state : states){
+			if((Integer) state[0] == 7){
+				jsonResult += "\"delivered\" : "+(BigInteger) state[1]+", ";
+			}
+			if((Integer) state[0] == 6){
+				jsonResult += "\"expired\" : "+(BigInteger) state[1]+", ";
+			}
+			if((Integer) state[0] == 5){
+				jsonResult += "\"deleted\" : "+(BigInteger) state[1]+", ";
+			}
+			if((Integer) state[0] == 4){
+				jsonResult += "\"undeliverable\" : "+(BigInteger) state[1]+", ";
+			}
+			if((Integer) state[0] == 3){
+				jsonResult += "\"accepted\" : "+(BigInteger) state[1]+", ";
+			}
+			if((Integer) state[0] == 2){
+				jsonResult += "\"rejected\" : "+(BigInteger) state[1]+", ";
+			}
+			if((Integer) state[0] == -1){
+				jsonResult += "\"unknown\" : "+(BigInteger) state[1]+", ";
+			}
+			
+			sent = sent.add((BigInteger) state[1]);
+		}
+		
+		jsonResult += "\"total\" : "+qTotal.list().get(0).toString()+", ";
+		jsonResult += "\"sent\" : "+sent+", ";
+		jsonResult = jsonResult.replaceAll("\\, $", " }");
 		
 		return jsonResult;
 	}

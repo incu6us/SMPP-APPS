@@ -12,6 +12,7 @@ import javax.annotation.PreDestroy;
 import javax.faces.context.FacesContext;
 import javax.faces.render.ResponseStateManager;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -30,6 +31,8 @@ import ua.com.life.smpp.db.service.TextForCampaignManageImpl;
 import ua.com.life.smpp.sami.smpp.SmppConnection;
 
 public class SmppConnectionInit {
+	
+	private static Logger LOGGER = Logger.getLogger(SmppConnection.class);
 
 	@Autowired
 	private SmppManage smppSettings;
@@ -51,13 +54,18 @@ public class SmppConnectionInit {
 
 		Thread.sleep(1000);
 		
+		/*
+		 *  At he start we change connection state to disconnected.
+		 *  After smpp connection will be established status will be corrected
+		 */
 		for(SmppSettings smpp : smppSettings.getAllSettings()){
 			smppSettings.changeConnectionState(smpp.getId(), 0);
 		}
 		
 		for (SmppSettings smpp : smppSettings.getActiveAccounts()) {
-			System.out.println("---- Started sysid: " + smpp.getName());
-
+//			System.out.println("---- Started sysid: " + smpp.getName());
+			LOGGER.debug("---- Started sysid: " + smpp.getName());
+			
 			connection.add(new SmppConnection(smpp));
 		}
 
