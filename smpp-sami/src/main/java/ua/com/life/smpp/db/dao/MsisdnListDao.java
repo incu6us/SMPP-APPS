@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import ua.com.life.smpp.db.domain.MsisdnList;
+import ua.com.life.smpp.db.domain.SmppSettings;
 
 public interface MsisdnListDao {
 	public MsisdnList getByMsisdnId(Long id);
@@ -22,4 +23,5 @@ public interface MsisdnListDao {
 	public Integer unsuccessMessagesByCampaignId(Long campaignId);
 	
 	public String messageStatusByCampaignIdInJson(Long campaignId);
+	public String getBusyStatusForAllSystemIds(List<SmppSettings> connectedSmpp);
 }

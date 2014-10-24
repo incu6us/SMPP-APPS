@@ -92,14 +92,14 @@
 		  <div class="radio" style="background-color: #fff;">
 		    <label for="radios-0">
 		      <input name="radios" id="radios-0" value="" checked="checked" type="radio">
-		      ALL ACTIVE SYSTEM IDs
+		      <label class="label label-default">- ALL ACTIVE SYSTEM IDs -</label>
 		    </label>
 			</div>
 		  <c:forEach items="${smppSettings}" var="smpp">
 		  <div class="radio" style="background-color: #fff;">
 		    <label for="radios-${smpp.systemId}">
 		      <input name="radios" id="radios-${smpp.systemId}" value="${smpp.id}" type="radio">
-		      ${smpp.systemId}
+		      <label class="label label-default">${smpp.systemId}</label> <label id="status-${smpp.systemId}"></label>
 		    </label>
 			</div>
 		  </c:forEach>

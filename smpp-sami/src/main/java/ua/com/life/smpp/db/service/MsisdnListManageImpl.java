@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ua.com.life.smpp.db.dao.MsisdnListDao;
 import ua.com.life.smpp.db.domain.MsisdnList;
+import ua.com.life.smpp.db.domain.SmppSettings;
 
 @Service
 public class MsisdnListManageImpl implements MsisdnListManage {
@@ -82,5 +83,10 @@ public class MsisdnListManageImpl implements MsisdnListManage {
 	@Transactional
 	public String messageStatusByCampaignIdInJson(Long campaignId){
 		return msisdnListDao.messageStatusByCampaignIdInJson(campaignId);
+	}
+	
+	@Transactional
+	public String getBusyStatusForAllSystemIds(List<SmppSettings> connectedSmpp){
+		return msisdnListDao.getBusyStatusForAllSystemIds(connectedSmpp);
 	}
 }

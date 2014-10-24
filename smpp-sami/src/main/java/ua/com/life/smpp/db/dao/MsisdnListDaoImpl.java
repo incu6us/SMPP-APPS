@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ua.com.life.smpp.db.domain.Campaign;
 import ua.com.life.smpp.db.domain.MsisdnList;
+import ua.com.life.smpp.db.domain.SmppSettings;
 import ua.com.life.smpp.db.domain.TextForCampaign;
 
 @Repository
@@ -185,6 +186,34 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 
 		jsonResult = "{ \"total\" : "+(String) total.list().get(0).toString()+", \"sending\" : "+(String) sending.list().get(0).toString()+", "
 				+ "\"success\" :  "+(String) success.list().get(0).toString()+", \"unsuccess\" : "+(String) unsuccess.list().get(0).toString()+" }";
+		
+		return jsonResult;
+	}
+	
+	@Override
+	public String getBusyStatusForAllSystemIds(List<SmppSettings> connectedSmpp){
+		String jsonResult;
+		
+		Query getAll = (Query) sessionFactory.getCurrentSession().createSQLQuery("SELECT 1 FROM sami.msisdn_list where (id_systemid is null or id_systemid = '') and status=0 limit 1");
+		if(getAll.list().size() != 0){
+			jsonResult = "{ ";
+			for(SmppSettings smpp : connectedSmpp){
+				jsonResult += "\""+smpp.getSystemId()+"\" : \"busy\", ";
+			}
+			jsonResult = jsonResult.replaceAll("\\, $", " }");
+			return jsonResult;
+		}
+		
+		jsonResult = "{ ";
+		for(SmppSettings smpp : connectedSmpp){
+			Query getBySmppId = (Query) sessionFactory.getCurrentSession().createSQLQuery("SELECT 1 FROM sami.msisdn_list where id_systemid = "+smpp.getId()+" and status=0 limit 1");
+			if(getBySmppId.list().size() != 0){
+				jsonResult += "\""+smpp.getSystemId()+"\" : \"busy\", ";
+			}else{
+				jsonResult += "\""+smpp.getSystemId()+"\" : \"free\", ";
+			}
+		}
+		jsonResult = jsonResult.replaceAll("\\, $", " }");
 		
 		return jsonResult;
 	}
