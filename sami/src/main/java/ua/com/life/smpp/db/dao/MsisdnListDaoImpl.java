@@ -185,13 +185,12 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	@Override
 	public String messageStatusByCampaignIdInJson(Long campaignId){
 		String jsonResult = "";
-		String total = "0";
+		BigInteger total = new BigInteger("0");
 		BigInteger sent = new BigInteger("0");
 		
-		Query qTotal = (Query) sessionFactory.getCurrentSession().createSQLQuery("select count(*) from msisdn_list where campaign_id = :campaignId").setLong("campaignId", campaignId);
-		
 		Query q = (Query) sessionFactory.getCurrentSession().createSQLQuery("select status, count(*) as count from msisdn_list "
-				+ "where status=7 or status = 6 or status = 5 or status = 4 or status = 3 or status = 2 or status = -1 or status = 1 group by status;");
+				+ "where campaign_id = :campaignId group by status;").setLong("campaignId", campaignId);
+		
 		
 		List<Object[]> states = (List<Object[]>) q.list();
 		
@@ -199,30 +198,40 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 		for(Object[] state : states){
 			if((Integer) state[0] == 7){
 				jsonResult += "\"delivered\" : "+(BigInteger) state[1]+", ";
+				sent = sent.add((BigInteger) state[1]);
 			}
 			if((Integer) state[0] == 6){
 				jsonResult += "\"expired\" : "+(BigInteger) state[1]+", ";
+				sent = sent.add((BigInteger) state[1]);
 			}
 			if((Integer) state[0] == 5){
 				jsonResult += "\"deleted\" : "+(BigInteger) state[1]+", ";
+				sent = sent.add((BigInteger) state[1]);
 			}
 			if((Integer) state[0] == 4){
 				jsonResult += "\"undeliverable\" : "+(BigInteger) state[1]+", ";
+				sent = sent.add((BigInteger) state[1]);
 			}
 			if((Integer) state[0] == 3){
 				jsonResult += "\"accepted\" : "+(BigInteger) state[1]+", ";
+				sent = sent.add((BigInteger) state[1]);
 			}
 			if((Integer) state[0] == 2){
 				jsonResult += "\"rejected\" : "+(BigInteger) state[1]+", ";
+				sent = sent.add((BigInteger) state[1]);
 			}
 			if((Integer) state[0] == -1){
 				jsonResult += "\"unknown\" : "+(BigInteger) state[1]+", ";
+				sent = sent.add((BigInteger) state[1]);
+			}
+			if((Integer) state[0] == 1){
+				sent = sent.add((BigInteger) state[1]);
 			}
 			
-			sent = sent.add((BigInteger) state[1]);
+			total = total.add((BigInteger) state[1]);
 		}
 		
-		jsonResult += "\"total\" : "+qTotal.list().get(0).toString()+", ";
+		jsonResult += "\"total\" : "+total+", ";
 		jsonResult += "\"sent\" : "+sent+", ";
 		jsonResult = jsonResult.replaceAll("\\, $", " }");
 		
