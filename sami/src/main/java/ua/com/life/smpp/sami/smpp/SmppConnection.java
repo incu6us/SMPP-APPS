@@ -274,7 +274,9 @@ public class SmppConnection {
 
 		try {
 			if (session.isBound() && session.isOpened()) {
-				setBound(true);
+				if(!getBound()){
+					setBound(true);
+				}
 			} else {
 				setBound(false);
 			}

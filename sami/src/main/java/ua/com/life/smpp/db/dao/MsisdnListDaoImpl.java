@@ -18,7 +18,6 @@ import org.springframework.stereotype.Repository;
 import ua.com.life.smpp.db.domain.Campaign;
 import ua.com.life.smpp.db.domain.MsisdnList;
 import ua.com.life.smpp.db.domain.SmppSettings;
-import ua.com.life.smpp.sami.message.MessagesStatusFromDeliveryReport;
 
 @Repository
 public class MsisdnListDaoImpl implements MsisdnListDao {
