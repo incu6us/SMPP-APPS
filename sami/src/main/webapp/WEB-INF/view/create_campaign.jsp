@@ -99,7 +99,7 @@
 		  <div class="radio" style="background-color: #fff;">
 		    <label for="radios-${smpp.systemId}">
 		      <input name="radios" id="radios-${smpp.systemId}" value="${smpp.id}" type="radio">
-		      <label class="label label-default">${smpp.systemId}</label> <label id="status-${smpp.systemId}"></label>
+		      <label class="label label-default">${smpp.systemId}</label> <label id="status-${smpp.systemId}"><span class="label label-success label-xs">free</span></label>
 		    </label>
 			</div>
 		  </c:forEach>

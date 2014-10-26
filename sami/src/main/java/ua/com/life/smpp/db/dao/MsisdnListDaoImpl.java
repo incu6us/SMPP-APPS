@@ -239,29 +239,18 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	
 	@Override
 	public String getBusyStatusForAllSystemIds(List<SmppSettings> connectedSmpp){
-		String jsonResult;
+		String jsonResult = "{ ";
 		
-		Query getAll = (Query) sessionFactory.getCurrentSession().createSQLQuery("SELECT 1 FROM sami.msisdn_list where (id_systemid is null or id_systemid = '') and status=0 limit 1");
-		if(getAll.list().size() != 0){
-			jsonResult = "{ ";
-			for(SmppSettings smpp : connectedSmpp){
-				jsonResult += "\""+smpp.getSystemId()+"\" : \"busy\", ";
-			}
-			jsonResult = jsonResult.replaceAll("\\, $", " }");
-			return jsonResult;
+		Query q = (Query) sessionFactory.getCurrentSession().createSQLQuery("SELECT ifnull(smpps.system_id, 'all'), 'busy' FROM msisdn_list msisdns left join "
+				+ "smpp_settings smpps on msisdns.id_systemid=smpps.id where msisdns.status=0 group by id_systemid;");
+		
+		List<Object[]> smpps = (List<Object[]>) q.list();
+		
+		for(Object[] smpp : smpps){
+			jsonResult += "\""+smpp[0]+"\" : \""+smpp[1]+"\", ";
 		}
+		jsonResult = jsonResult.replaceAll("\\, $", "");
 		
-		jsonResult = "{ ";
-		for(SmppSettings smpp : connectedSmpp){
-			Query getBySmppId = (Query) sessionFactory.getCurrentSession().createSQLQuery("SELECT 1 FROM sami.msisdn_list where id_systemid = "+smpp.getId()+" and status=0 limit 1");
-			if(getBySmppId.list().size() != 0){
-				jsonResult += "\""+smpp.getSystemId()+"\" : \"busy\", ";
-			}else{
-				jsonResult += "\""+smpp.getSystemId()+"\" : \"free\", ";
-			}
-		}
-		jsonResult = jsonResult.replaceAll("\\, $", " }");
-		
-		return jsonResult;
+		return jsonResult+" }";
 	}
 }

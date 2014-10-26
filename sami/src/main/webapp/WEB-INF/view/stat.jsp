@@ -12,7 +12,8 @@
 	
 	<br>
 	
-	<table class="table table-striped table-bordered table-hover" style="background-color: #dff0d8">
+	<table class="table table-striped table-bordered table-hover" style="background-color: #dff0d8" id="tableQuery">
+		<thead>
 		<th><center>
 				<b>#</b>
 			</center></th>
@@ -32,6 +33,8 @@
 				<b>Sent Messages:</b>
 			</center></th>
 		<th></th>
+		</thead>
+		<tbody>
 		<c:forEach items="${messageObjects}" var="messageObject" varStatus="rowCounter">
 			<tr>
 				<td>${rowCounter.index+1}</td>
@@ -44,7 +47,7 @@
 				<td><center><a href='<c:url value="/stat/delete?campaign_id=${messageObject.campaignId}"></c:url>' type="button" class="btn btn-danger btn-xs">Delete</a></center></td>
 			</tr>
 		</c:forEach>
-
+		</tbody>
 	</table>
 </c:if>
 

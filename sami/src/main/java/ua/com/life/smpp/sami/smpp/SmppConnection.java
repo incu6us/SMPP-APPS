@@ -278,7 +278,9 @@ public class SmppConnection {
 					setBound(true);
 				}
 			} else {
-				setBound(false);
+				if(getBound()){
+					setBound(false);
+				}
 			}
 		} catch (Exception e) {
 			setBound(false);
