@@ -86,7 +86,7 @@ public class MsisdnListManageImpl implements MsisdnListManage {
 	}
 	
 	@Transactional
-	public String getBusyStatusForAllSystemIds(List<SmppSettings> connectedSmpp){
-		return msisdnListDao.getBusyStatusForAllSystemIds(connectedSmpp);
+	public String getBusyStatusForAllSystemIds(){
+		return msisdnListDao.getBusyStatusForAllSystemIds();
 	}
 }

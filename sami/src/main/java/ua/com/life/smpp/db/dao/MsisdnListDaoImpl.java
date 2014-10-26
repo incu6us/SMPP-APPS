@@ -238,7 +238,7 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	}
 	
 	@Override
-	public String getBusyStatusForAllSystemIds(List<SmppSettings> connectedSmpp){
+	public String getBusyStatusForAllSystemIds(){
 		String jsonResult = "{ ";
 		
 		Query q = (Query) sessionFactory.getCurrentSession().createSQLQuery("SELECT ifnull(smpps.system_id, 'all'), 'busy' FROM msisdn_list msisdns left join "

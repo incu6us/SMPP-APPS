@@ -23,5 +23,5 @@ public interface MsisdnListDao {
 	public Integer unsuccessMessagesByCampaignId(Long campaignId);
 	
 	public String messageStatusByCampaignIdInJson(Long campaignId);
-	public String getBusyStatusForAllSystemIds(List<SmppSettings> connectedSmpp);
+	public String getBusyStatusForAllSystemIds();
 }

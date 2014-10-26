@@ -25,16 +25,12 @@ public class GetSystemIdBusyStatus {
 	@Autowired
 	private MsisdnListManage msisdn;
 	
-	@Autowired
-	private SmppManage smpps;
-	
 	
 	@GET
 	@Path("all")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getState(){
-		List<SmppSettings> connectedSmpp = smpps.getActiveAccounts();
 		
-		return Response.status(200).entity(msisdn.getBusyStatusForAllSystemIds(connectedSmpp)).build();
+		return Response.status(200).entity(msisdn.getBusyStatusForAllSystemIds()).build();
 	}
 }
