@@ -239,12 +239,12 @@ label {
   right: 5px;
   background: #00a2d3;
   border-radius: 24px;
-  background-image: -webkit-linear-gradient(top, #01A9DB, #01A9DB);
-  background-image: -moz-linear-gradient(top, #01A9DB, #01A9DB);
-  background-image: -o-linear-gradient(top, #01A9DB, #01A9DB);
-  background-image: linear-gradient(to bottom, #01A9DB, #01A9DB);
-  -webkit-box-shadow: inset 0 0 0 1px #01A9DB, 0 0 0 5px rgba(0, 0, 0, 0.16);
-  box-shadow: inset 0 0 0 1px #01A9DB, 0 0 0 5px rgba(0, 0, 0, 0.16);
+  background-image: -webkit-linear-gradient(top, #4c74a7, #4c74a7);
+  background-image: -moz-linear-gradient(top, #4c74a7, #4c74a7);
+  background-image: -o-linear-gradient(top, #4c74a7, #4c74a7);
+  background-image: linear-gradient(to bottom, #4c74a7, #4c74a7);
+  -webkit-box-shadow: inset 0 0 0 1px #4c74a7, 0 0 0 5px rgba(0, 0, 0, 0.16);
+  box-shadow: inset 0 0 0 1px #4c74a7, 0 0 0 5px rgba(0, 0, 0, 0.16);
 }
 .login-button:active:before {
   background: #0591ba;
@@ -296,7 +296,7 @@ label {
   float: left;
   margin-left: 20px;
 }
-a:link {color:#01A9DB;}      
-a:visited {color:#01A9DB;}  
-a:hover {color:#01A9DB;}  
-a:active {color:#01A9DB;}
+a:link {color:#4c74a7;}      
+a:visited {color:#4c74a7;}  
+a:hover {color:#4c74a7;}  
+a:active {color:#4c74a7;}

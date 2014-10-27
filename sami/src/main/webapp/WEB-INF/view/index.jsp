@@ -3,6 +3,12 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="java.util.Arrays"%>
+<%@ page import="org.springframework.context.annotation.Import"%>
+<%@ page import="org.springframework.security.core.Authentication" %>
+<%@ page import="org.springframework.security.core.GrantedAuthority" %>
+<%@ page import="org.springframework.security.core.context.SecurityContextHolder" %>
+<%@ page import="java.util.Collection" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -35,7 +41,7 @@ function len_display(Object,MaxLen,element){
 }
 </script>
 
-<c:if test="${pageName == 'stat'}">
+<c:if test="${(pageName == 'stat') or (pageName == 'users')}">
 <script type="text/javascript">
 /* DOM table*/
 $.extend( true, $.fn.dataTable.defaults, {
@@ -304,6 +310,13 @@ $(document).ready(function(){
 
 </head>
 <body>
+
+	<%
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String userName = auth.getName();
+		Object[] authorities = auth.getAuthorities().toArray();
+	%>
+	
 	<div>
 		<nav id="myNavbar" class="navbar navbar-inverse navbar-fixed-top"
 			role="navigation"> <!-- Brand and toggle get grouped for better mobile display -->
@@ -316,7 +329,7 @@ $(document).ready(function(){
 				id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
 					<li class="dropdown"><a href="#" data-toggle="dropdown"
-						class="dropdown-toggle">Menu <b class="caret"></b>
+						class="dropdown-toggle">Menu<b class="caret"></b>
 					</a>
 						<ul class="dropdown-menu">
 							<li><a href='<c:url value="/"></c:url>'>Create Campaign</a></li>
@@ -326,15 +339,19 @@ $(document).ready(function(){
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li class="dropdown"><a href="#" data-toggle="dropdown"
-						class="dropdown-toggle">VIACHESLAV.PRYIMAK <b class="caret"></b>
+						class="dropdown-toggle"><%= userName.toUpperCase() %><b class="caret"></b>
 					</a>
 						<ul class="dropdown-menu">
-							<li><a href='<c:url value="/users"></c:url>'>User
-									Management</a></li>
-							<li><a href='<c:url value="/smpp_settings"></c:url>'>SMPP
-									Settings</a></li>
-							<li class="divider"></li>
-							<li><a href="?logout">Logout</a></li>
+							<c:if test="<%=authorities[0].toString().equals("ROLE_SU")%>">
+								<li><a href='<c:url value="/users"></c:url>'>User
+										Management</a></li>
+							</c:if>
+							<c:if test="<%=authorities[0].toString().equals("ROLE_SU") || authorities[0].toString().equals("ROLE_ADMIN")%>">
+								<li><a href='<c:url value="/smpp_settings"></c:url>'>SMPP
+										Settings</a></li>
+								<li class="divider"></li>
+							</c:if>
+							<li><a href='<c:url value="/logout"></c:url>'>Logout</a></li>
 						</ul></li>
 				</ul>
 			</div>
@@ -355,6 +372,9 @@ $(document).ready(function(){
 				</c:when>
 				<c:when test="${pageName=='smppSettings'}">
 					<jsp:include page="smpp_settings.jsp"></jsp:include>
+				</c:when>
+				<c:when test="${pageName=='users'}">
+					<jsp:include page="user_settings.jsp"></jsp:include>
 				</c:when>
 			</c:choose>
 

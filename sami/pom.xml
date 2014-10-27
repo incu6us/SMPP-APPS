@@ -247,6 +247,16 @@
 		<!-- Not work with Glassfish -->
 		<!-- <dependency> <groupId>org.apache.activemq</groupId> <artifactId>activemq-core</artifactId> 
 			<version>5.7.0</version> </dependency>-->
+			
+		<!-- Jolokia -->
+		<dependency>
+			<groupId>org.jolokia</groupId>
+			<artifactId>jolokia-jvm</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
+
+
 	</dependencies>
 	<build>
 		<finalName>sami</finalName>

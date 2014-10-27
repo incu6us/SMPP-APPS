@@ -278,9 +278,7 @@ public class SmppConnection {
 					setBound(true);
 				}
 			} else {
-				if(getBound()){
-					setBound(false);
-				}
+				setBound(false);
 			}
 		} catch (Exception e) {
 			setBound(false);
@@ -536,12 +534,12 @@ public class SmppConnection {
 				String message = null;
 				String sourceAddr = null;
 				String validityPeriod = null;
-				List<MsisdnList> msisdnList = null;
+//				List<MsisdnList> msisdnList = null;
 				Long oldSmppSettingVersion = smppSettings.getSettingsByName(sessName).getVersion();
 
 				while (true) {
 
-					msisdnList = msisdn.getByMsisdnByStatusForIdSystemId(0, maxMessagesLimitForSysId, smppSettings.getSettingsByName(sessName).getId());
+					List<MsisdnList> msisdnList = msisdn.getByMsisdnByStatusForIdSystemId(0, maxMessagesLimitForSysId, smppSettings.getSettingsByName(sessName).getId());
 					
 //					if(msisdnList.size() == 0){
 //						msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitForSysId);

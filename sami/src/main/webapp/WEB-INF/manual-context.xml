@@ -48,6 +48,7 @@
 				<prop key="hibernate.c3p0.max_statements">50</prop>
 				<prop key="hibernate.c3p0.idle_test_period">3000</prop>
 				<prop key="hibernate.jdbc.batch_size">20</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
 			</props>
 		</property>
 
@@ -57,6 +58,7 @@
 				<value>ua.com.life.smpp.db.domain.MsisdnList</value>
 				<value>ua.com.life.smpp.db.domain.Campaign</value>
 				<value>ua.com.life.smpp.db.domain.TextForCampaign</value>
+				<value>ua.com.life.smpp.db.domain.User</value>
 			</list>
 		</property>
 	</bean>
@@ -67,8 +69,9 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
+
 	<!-- Security -->
-	<!-- <import resource="security.xml" />-->
+	<import resource="security.xml" />
 
 </beans>
 

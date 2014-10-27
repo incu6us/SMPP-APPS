@@ -9,7 +9,7 @@
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/tx 
         http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-        
+
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix">
@@ -19,18 +19,18 @@
 			<value>.jsp</value>
 		</property>
 	</bean>
-	
-	
+
+
 	<bean id="multipartResolver"
-        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <!-- max upload size in bytes -->
-        <property name="maxUploadSize" value="20971520" /> <!-- 20MB -->
-         
-        <!-- max size of file in memory (in bytes) -->
-        <property name="maxInMemorySize" value="1048576" /> <!-- 1MB -->
- 
-    </bean>
-	
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- max upload size in bytes -->
+		<property name="maxUploadSize" value="20971520" /> <!-- 20MB -->
+
+		<!-- max size of file in memory (in bytes) -->
+		<property name="maxInMemorySize" value="1048576" /> <!-- 1MB -->
+
+	</bean>
+
 
 	<!-- This sescion tells Spring context where to look for bean classes with 
 		appropriate annotations -->
@@ -39,7 +39,7 @@
 	<context:component-scan base-package="ua.com.life.smpp.db.service"></context:component-scan>
 	<context:component-scan base-package="ua.com.life.ui.controller"></context:component-scan>
 	<context:component-scan base-package="ua.com.life.sami.rest"></context:component-scan>
-	
+
 	<!-- Configure JDBC Connection -->
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
@@ -68,6 +68,8 @@
 				<prop key="hibernate.c3p0.max_statements">50</prop>
 				<prop key="hibernate.c3p0.idle_test_period">3000</prop>
 				<prop key="hibernate.jdbc.batch_size">20</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
+
 			</props>
 		</property>
 
@@ -77,6 +79,7 @@
 				<value>ua.com.life.smpp.db.domain.MsisdnList</value>
 				<value>ua.com.life.smpp.db.domain.Campaign</value>
 				<value>ua.com.life.smpp.db.domain.TextForCampaign</value>
+				<value>ua.com.life.smpp.db.domain.User</value>
 			</list>
 		</property>
 	</bean>
@@ -86,9 +89,31 @@
 		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-	
+
+
+	<bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
+		<property name="beans">
+			<map>
+				<entry key="Hibernate:application=Statistics" value-ref="hibernateStatisticsBean" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hibernateStatisticsBean" class="org.hibernate.jmx.StatisticsService">
+		<property name="statisticsEnabled" value="true" />
+		<property name="sessionFactory">
+			<!-- Uncomment the following when using Hibernate directly -->
+			<ref local="sessionFactory"/>
+
+			<!-- Uncomment the following when using Hibernate via JPA (Assuming the 
+				managed EMF is named 'entityManagerFactory'. Namespace is: xmlns:util="http://www.springframework.org/schema/util") -->
+			<!-- util:property-path path="entityManagerFactory.sessionFactory" / -->
+		</property>
+	</bean>
+
+
 	<!-- Security -->
-	<!-- <import resource="security.xml" /> -->
+	<import resource="security.xml" />
 
 </beans>
 

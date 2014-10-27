@@ -1,6 +1,8 @@
 package ua.com.life.sami.init;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +15,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.render.ResponseStateManager;
 
 import org.apache.log4j.Logger;
+import org.jolokia.jvmagent.JolokiaServer;
+import org.jolokia.jvmagent.JolokiaServerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -50,8 +54,11 @@ public class SmppConnectionInit {
 
 	
 	@PostConstruct
-	public void init() throws InterruptedException {
-
+	public void init() throws InterruptedException, IOException {
+		JolokiaServerConfig config = new JolokiaServerConfig(new HashMap<String, String>());
+		JolokiaServer jolokiaServer = new JolokiaServer(config, true);
+		jolokiaServer.start();
+		
 		Thread.sleep(1000);
 		
 		/*
