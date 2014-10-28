@@ -46,7 +46,8 @@
 		<thead>
 		<th>#</th>
 		<th>Username</th>
-		<th>Action</th>
+		<th>Roles</th>
+		<th></th>
 		</thead>
 		<tbody>
 		<c:forEach items="${userList}" var="user" varStatus="status">
