@@ -308,6 +308,8 @@ $(document).ready(function(){
 </script>
 </c:if>
 
+<title>SMPP Advanced Messaging Interface</title>
+
 </head>
 <body>
 

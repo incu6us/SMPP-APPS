@@ -1,6 +1,7 @@
 package ua.com.life.sami.init;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,9 +56,13 @@ public class SmppConnectionInit {
 	
 	@PostConstruct
 	public void init() throws InterruptedException, IOException {
-		JolokiaServerConfig config = new JolokiaServerConfig(new HashMap<String, String>());
-		JolokiaServer jolokiaServer = new JolokiaServer(config, true);
-		jolokiaServer.start();
+		try{
+			JolokiaServerConfig config = new JolokiaServerConfig(new HashMap<String, String>());
+			JolokiaServer jolokiaServer = new JolokiaServer(config, true);
+			jolokiaServer.start();
+		}catch(BindException e){
+			LOGGER.warn("Jolokia server bind failed: "+e);
+		}
 		
 		Thread.sleep(1000);
 		

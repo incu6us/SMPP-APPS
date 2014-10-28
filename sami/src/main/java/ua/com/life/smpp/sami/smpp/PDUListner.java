@@ -19,6 +19,7 @@ import org.smpp.pdu.PDU;
 import org.smpp.pdu.Request;
 import org.smpp.pdu.Response;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import ua.com.life.sami.init.Constants;
@@ -39,7 +40,7 @@ public class PDUListner implements ServerPDUEventListener {
 	
 	@Override
 	public void handleEvent(ServerPDUEvent event) {
-		ctx = new FileSystemXmlApplicationContext(Constants.manualContext);
+		ctx = new ClassPathXmlApplicationContext(Constants.manualContext);
 
 		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
 		

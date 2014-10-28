@@ -3,14 +3,13 @@ package ua.com.life.sami.init;
 public class Constants {
 
 	// Conf files
-	public static String propsFilePath = "src/main/resources/smppparams.cfg";
-//	public static String propsFilePath = "smppparams.cfg";
-	public static String rootContect = "";
-	public static String manualContext = "src/main/webapp/WEB-INF/manual-context.xml";
-	public static String mvcContect = "";
+//	public static String propsFilePath = "src/main/resources/smppparams.cfg";
+	public static String propsFilePath = "smppparams.cfg";
+//	public static String manualContext = "src/main/webapp/WEB-INF/manual-context.xml";
+	public static String manualContext = "manual-context.xml";
 	
 	// enquire link timeout
-	public static int enquireLinkTimeout = 5000;
+	public static int enquireLinkTimeout = 30000;
 	
 	// Deliver_SM statuses
 	public static String statusDelivered		= "DELIVRD";  // 7

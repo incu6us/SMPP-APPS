@@ -24,7 +24,7 @@ import org.smpp.pdu.Unbind;
 import org.smpp.pdu.UnbindResp;
 import org.smpp.pdu.WrongLengthOfStringException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import ua.com.life.sami.init.Constants;
 import ua.com.life.smpp.db.domain.MsisdnList;
@@ -36,19 +36,19 @@ import ua.com.life.smpp.db.service.TextForCampaignManage;
 public class SmppConnection {
 
 	private static Logger LOGGER = Logger.getLogger(SmppConnection.class);
-	
-	private volatile static int enquireLinkTimeout = Constants.enquireLinkTimeout;
+
+	private volatile int enquireLinkTimeout = Constants.enquireLinkTimeout;
 
 	/**
 	 * File with default settings for the application.
 	 */
-	private static String propsFilePath = Constants.propsFilePath;
+	private String propsFilePath = Constants.propsFilePath;
 	
 	/**
 	 * This is the SMPP session used for communication with SMSC.
 	 */
 	private Session session = null;
-	private PDUListner pduListener;
+//	private PDUListner pduListener;
 
 	private String sessName = null;
 	/**
@@ -84,9 +84,9 @@ public class SmppConnection {
 	 */
 	
 	private int maxMessagesLimitForSysId;
+//	ApplicationContext ctx = new FileSystemXmlApplicationContext(Constants.manualContext);
+	ApplicationContext ctx = new ClassPathXmlApplicationContext(Constants.manualContext);
 	
-	ApplicationContext ctx = new FileSystemXmlApplicationContext(Constants.manualContext);
-
 	SmppManage smppSettings = (SmppManage) ctx.getBean("smppManageImpl");
 	MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
 	TextForCampaignManage text = (TextForCampaignManage) ctx.getBean("textForCampaignManageImpl");
@@ -130,13 +130,27 @@ public class SmppConnection {
 	 */
 
 	public SmppConnection(String sessName, String systemId, String password, String ipAddress, int port, int maxMessagesLimitForSysId) {
+//		this.sessName = sessName;
+//		this.systemId = systemId;
+//		this.password = password;
+//		this.ipAddress = ipAddress;
+//		this.port = port;
+//		this.maxMessagesLimitForSysId = maxMessagesLimitForSysId;
+		
 		this.sessName = sessName;
 		this.systemId = systemId;
-		this.password = password;
-		this.ipAddress = ipAddress;
-		this.port = port;
-		this.maxMessagesLimitForSysId = maxMessagesLimitForSysId;
-		
+		try{
+			this.password = smppSettings.getSettingsByName(sessName).getPassword();
+			this.ipAddress = smppSettings.getSettingsByName(sessName).getHost();
+			this.port = smppSettings.getSettingsByName(sessName).getPort();
+			this.maxMessagesLimitForSysId = smppSettings.getSettingsByName(sessName).getMaxMessagesLimitForSysId();
+		}catch(IndexOutOfBoundsException e){
+			this.password = password;
+			this.ipAddress = ipAddress;
+			this.port = port;
+			this.maxMessagesLimitForSysId = maxMessagesLimitForSysId;
+		}
+
 		try {
 			loadProperties(propsFilePath);
 		} catch (IOException e) {
@@ -171,7 +185,7 @@ public class SmppConnection {
 		this.ipAddress = settings.getHost();
 		this.port = settings.getPort();
 		this.maxMessagesLimitForSysId = settings.getMaxMessagesLimitForSysId();
-
+		
 		try {
 			loadProperties(propsFilePath);
 		} catch (IOException e) {
@@ -224,7 +238,7 @@ public class SmppConnection {
 			request = new BindTransciever();
 			TCPIPConnection connection = new TCPIPConnection(ipAddress, port);
 			session = new Session(connection);
-			pduListener = new PDUListner(session);
+//			pduListener = new PDUListner(session);
 			// set values
 			request.setSystemId(systemId);
 			request.setPassword(password);
@@ -235,7 +249,7 @@ public class SmppConnection {
 //			System.out.println("Bind request " + request.debugString());
 			LOGGER.debug("Bind request " + request.debugString());
 			
-			response = session.bind(request, pduListener);
+			response = session.bind(request, new PDUListner(session));
 
 			Thread.sleep(1000);
 
@@ -247,8 +261,19 @@ public class SmppConnection {
 //				System.out.println("Bind failed for " + this.sessName + ", code " + response.getCommandStatus());
 				LOGGER.debug("Bind failed for " + this.sessName + ", code " + response.getCommandStatus());
 				while (!isBound()) {
-					bind();
-					Thread.sleep(5000);
+					try{
+						if(smppSettings.getSettingsByName(sessName).getActive() == 1){
+							bind();
+							Thread.sleep(5000);
+						}else{
+							closeSmppConnection();
+							break;
+						}
+					}catch(Exception e){
+						LOGGER.info("Thread "+sessName+" was interrupted. "+e);
+						closeSmppConnection();
+						break;
+					}
 				}
 			}
 
@@ -256,12 +281,19 @@ public class SmppConnection {
 //			System.out.println("Bind operation failed. " + e);
 			LOGGER.error("Bind operation failed. " + this.sessName + ": " + e);
 			while (!isBound()) {
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e1) {
-					LOGGER.warn("Thread interrupted: "+e1);
+				try{
+					if(smppSettings.getSettingsByName(sessName).getActive() == 1){
+						Thread.sleep(5000);
+						bind();
+					}else{
+						closeSmppConnection();
+						break;
+					}
+				}catch(Exception e1){
+					LOGGER.info("Thread "+sessName+" was interrupted. "+e1);
+					closeSmppConnection();
+					break;
 				}
-				bind();
 			}
 		}
 	}
@@ -422,8 +454,9 @@ public class SmppConnection {
 	 * private variable to the loaded values.
 	 */
 	private void loadProperties(String fileName) throws IOException {
-		System.out.println("Reading configuration file " + fileName + "...");
-		FileInputStream propsFile = new FileInputStream(fileName);
+//		System.out.println("Reading configuration file " + fileName + "...");
+		LOGGER.info("Reading configuration file " + fileName + "...");
+		FileInputStream propsFile = new FileInputStream(this.getClass().getClassLoader().getResource(fileName).getFile());
 		properties.load(propsFile);
 		propsFile.close();
 //		System.out.println("Setting default parameters...");
@@ -559,11 +592,16 @@ public class SmppConnection {
 							// Rebind if session is closed
 							unbind();
 							while (!isBound()) {
-								bind();
-								try {
-									Thread.sleep(5000);
-								} catch (InterruptedException e1) {
-									LOGGER.warn("Interruption thread: "+e1);
+								if(smppSettings.getSettingsByName(sessName).getActive() == 1){
+									bind();
+									try {
+										Thread.sleep(5000);
+									} catch (InterruptedException e1) {
+										LOGGER.warn("Interruption thread: "+e1);
+									}
+								}else{
+									closeSmppConnection();
+									break;
 								}
 							}
 						} 
@@ -588,7 +626,7 @@ public class SmppConnection {
 							sourceAddr = num.getCampaign().getSourceAddr();
 							validityPeriod = num.getValidityPeriod();
 	
-							System.out.println("--->>> Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
+//							System.out.println("--->>> Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
 							LOGGER.debug("--->>> Sysid:" + sessName + " msisdn: " + msisdnOrigNum);
 							submit(msisdnOrigNum, message, sourceAddr, validityPeriod);
 							

@@ -60,7 +60,7 @@
 		<property name="hibernateProperties">
 			<props>
 				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-				<prop key="hibernate.show_sql">true</prop>
+<!-- 				<prop key="hibernate.show_sql">true</prop> -->
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
 				<prop key="hibernate.c3p0.min_size">5</prop>
 				<prop key="hibernate.c3p0.max_size">20</prop>
@@ -90,26 +90,6 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-
-	<bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
-		<property name="beans">
-			<map>
-				<entry key="Hibernate:application=Statistics" value-ref="hibernateStatisticsBean" />
-			</map>
-		</property>
-	</bean>
-
-	<bean id="hibernateStatisticsBean" class="org.hibernate.jmx.StatisticsService">
-		<property name="statisticsEnabled" value="true" />
-		<property name="sessionFactory">
-			<!-- Uncomment the following when using Hibernate directly -->
-			<ref local="sessionFactory"/>
-
-			<!-- Uncomment the following when using Hibernate via JPA (Assuming the 
-				managed EMF is named 'entityManagerFactory'. Namespace is: xmlns:util="http://www.springframework.org/schema/util") -->
-			<!-- util:property-path path="entityManagerFactory.sessionFactory" / -->
-		</property>
-	</bean>
 
 
 	<!-- Security -->
