@@ -77,14 +77,14 @@ public class MsisdnListDaoImpl implements MsisdnListDao {
 	
 	@Override
 	public List<MsisdnList> getByMsisdnByStatusForIdSystemId(Integer status, int limit, Long idSystemId) {
-		List<MsisdnList> list;
+		List<MsisdnList> list = null;
 		
 		Query q = (Query) sessionFactory.getCurrentSession().createQuery("from MsisdnList m where status = :status and (idSystemId = :idSystemId or idSystemId = '' or idSystemId = null)").setMaxResults(limit).setLockMode("m", LockMode.PESSIMISTIC_READ);
 		q.setInteger("status", status);
 		q.setLong("idSystemId", idSystemId);
 		list = q.list();
 		
-		updateSendedToSmsc((List<MsisdnList>) list);
+		updateSendedToSmsc(list);
 		
 		return list;
 		

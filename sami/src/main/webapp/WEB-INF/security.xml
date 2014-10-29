@@ -7,19 +7,19 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
 
 	<http access-denied-page="/WEB-INF/view/403.jsp">
-		<intercept-url pattern="/camp*" access="ROLE_SU,ROLE_ADMIN,ROLE_USER" />
-		<intercept-url pattern="/upload*" access="ROLE_SU,ROLE_ADMIN,ROLE_USER" />
-		<intercept-url pattern="/stat*" access="ROLE_SU,ROLE_ADMIN,ROLE_USER" />
-		<intercept-url pattern="/smpp_settings*" access="ROLE_SU,ROLE_ADMIN" />
-		<intercept-url pattern="/users*" access="ROLE_SU" />
-		<intercept-url pattern="/index*" access="ROLE_SU,ROLE_ADMIN,ROLE_USER" />
+		<intercept-url pattern="/camp**" access="ROLE_SU,ROLE_ADMIN,ROLE_USER" />
+		<intercept-url pattern="/upload**" access="ROLE_SU,ROLE_ADMIN,ROLE_USER" />
+		<intercept-url pattern="/stat**" access="ROLE_SU,ROLE_ADMIN,ROLE_USER" />
+		<intercept-url pattern="/smpp_settings**" access="ROLE_SU,ROLE_ADMIN" />
+		<intercept-url pattern="/users**" access="ROLE_SU" />
+		<intercept-url pattern="/index**" access="ROLE_SU,ROLE_ADMIN,ROLE_USER" />
 		<intercept-url pattern="/" access="ROLE_SU,ROLE_ADMIN,ROLE_USER" />
 		<form-login login-page="/login" default-target-url="/index"
 			authentication-failure-url="/?error=true" username-parameter="username"
 			password-parameter="password" />
 		<logout logout-url="/logout" logout-success-url="/login" />
 
-		<anonymous username="guest" granted-authority="ROLE_ANONYMOUS" />
+		<anonymous enabled="false" username="guest" granted-authority="ROLE_ANONYMOUS" />
 		<remember-me />
 	</http>
 

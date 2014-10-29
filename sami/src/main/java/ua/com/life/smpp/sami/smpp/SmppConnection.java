@@ -181,11 +181,18 @@ public class SmppConnection {
 	public SmppConnection(SmppSettings settings) {
 		this.sessName = settings.getName();
 		this.systemId = settings.getSystemId();
-		this.password = settings.getPassword();
-		this.ipAddress = settings.getHost();
-		this.port = settings.getPort();
-		this.maxMessagesLimitForSysId = settings.getMaxMessagesLimitForSysId();
 		
+		try{
+			this.password = smppSettings.getSettingsByName(sessName).getPassword();
+			this.ipAddress = smppSettings.getSettingsByName(sessName).getHost();
+			this.port = smppSettings.getSettingsByName(sessName).getPort();
+			this.maxMessagesLimitForSysId = smppSettings.getSettingsByName(sessName).getMaxMessagesLimitForSysId();
+		}catch(IndexOutOfBoundsException e){
+			this.password = settings.getPassword();
+			this.ipAddress = settings.getHost();
+			this.port = settings.getPort();
+			this.maxMessagesLimitForSysId = settings.getMaxMessagesLimitForSysId();
+		}
 		try {
 			loadProperties(propsFilePath);
 		} catch (IOException e) {
@@ -569,10 +576,11 @@ public class SmppConnection {
 				String validityPeriod = null;
 //				List<MsisdnList> msisdnList = null;
 				Long oldSmppSettingVersion = smppSettings.getSettingsByName(sessName).getVersion();
+				List<MsisdnList> msisdnList = null;
 
 				while (true) {
-
-					List<MsisdnList> msisdnList = msisdn.getByMsisdnByStatusForIdSystemId(0, maxMessagesLimitForSysId, smppSettings.getSettingsByName(sessName).getId());
+					
+					msisdnList = msisdn.getByMsisdnByStatusForIdSystemId(0, maxMessagesLimitForSysId, smppSettings.getSettingsByName(sessName).getId());
 					
 //					if(msisdnList.size() == 0){
 //						msisdnList = msisdn.getByMsisdnByStatus(0, maxMessagesLimitForSysId);
@@ -631,7 +639,7 @@ public class SmppConnection {
 							submit(msisdnOrigNum, message, sourceAddr, validityPeriod);
 							
 						}
-
+						
 						Long finished = System.currentTimeMillis();
 						Long timeResult = finished - started;
 						

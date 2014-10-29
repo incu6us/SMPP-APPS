@@ -84,6 +84,26 @@ public class SmppConnectionInit {
 		for(SmppConnection conn : connection){
 			conn.run();
 		}
+		
+
+//		Thread gc = new Thread(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				// TODO Auto-generated method stub
+//				while(true){
+//					try {
+//						Thread.sleep(60000);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					System.gc();
+//				}
+//			}
+//		});
+//		gc.setName("Garbage Collector Thread");
+//		gc.start();
 	}
 
 }

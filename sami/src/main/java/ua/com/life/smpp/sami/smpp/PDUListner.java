@@ -18,6 +18,7 @@ import org.smpp.pdu.DeliverSM;
 import org.smpp.pdu.PDU;
 import org.smpp.pdu.Request;
 import org.smpp.pdu.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -32,7 +33,20 @@ public class PDUListner implements ServerPDUEventListener {
 	private static Logger LOGGER = Logger.getLogger(PDUListner.class); 
 	
 	private Session session = null;
-	private ApplicationContext ctx;
+	private ApplicationContext ctx = new ClassPathXmlApplicationContext(Constants.manualContext);
+	private MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
+	private PDU pdu = null;
+	private Response response = null;
+	private DeliverSM deliverSM = null;
+	private Map<String, String> parsedMessage = null;
+	
+	private SimpleDateFormat dateFormat = null;
+	private String id = null;
+	private Date submitDate = null;
+	private Date doneDate = null;
+	private String status = null;
+	private String err = null;
+	
 	
 	public PDUListner(Session session) {
 		this.session = session;
@@ -40,15 +54,12 @@ public class PDUListner implements ServerPDUEventListener {
 	
 	@Override
 	public void handleEvent(ServerPDUEvent event) {
-		ctx = new ClassPathXmlApplicationContext(Constants.manualContext);
-
-		MsisdnListManage msisdn = (MsisdnListManage) ctx.getBean("msisdnListManageImpl");
 		
-		PDU pdu = event.getPDU();
+		pdu = event.getPDU();
 
 //        if (pdu.isValid() && pdu.isRequest()) {
 		if (pdu.isRequest()) {
-            Response response = ((Request) pdu).getResponse();
+            response = ((Request) pdu).getResponse();
 
             try {
                 session.respond(response);
@@ -58,38 +69,38 @@ public class PDUListner implements ServerPDUEventListener {
             }
 
             if (pdu instanceof DeliverSM) {
-                DeliverSM deliverSM = (DeliverSM) pdu;
-                System.out.println("Destination address: " + deliverSM.getDestAddr().getAddress());
-                System.out.println("Source address: " + deliverSM.getSourceAddr().getAddress());
-                System.out.println("SMS length: " + deliverSM.getSmLength());
-                System.out.println("SMS: " + deliverSM.getShortMessage());
-                LOGGER.debug("Destination address: " + deliverSM.getDestAddr().getAddress());
-                LOGGER.debug("Source address: " + deliverSM.getSourceAddr().getAddress());
-                LOGGER.debug("SMS length: " + deliverSM.getSmLength());
-                LOGGER.debug("SMS: " + deliverSM.getShortMessage());
+                deliverSM = (DeliverSM) pdu;
+//                System.out.println("Destination address: " + deliverSM.getDestAddr().getAddress());
+//                System.out.println("Source address: " + deliverSM.getSourceAddr().getAddress());
+//                System.out.println("SMS length: " + deliverSM.getSmLength());
+//                System.out.println("SMS: " + deliverSM.getShortMessage());
+//                LOGGER.debug("Destination address: " + deliverSM.getDestAddr().getAddress());
+//                LOGGER.debug("Source address: " + deliverSM.getSourceAddr().getAddress());
+//                LOGGER.debug("SMS length: " + deliverSM.getSmLength());
+//                LOGGER.debug("SMS: " + deliverSM.getShortMessage());
                 
-                Map<String, String> parsedMessage = parseShortMessage(deliverSM.getShortMessage());
+                parsedMessage = parseShortMessage(deliverSM.getShortMessage().intern());
                 
-                SimpleDateFormat dateFormat = new SimpleDateFormat();
+                dateFormat = new SimpleDateFormat();
                 dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
 
-                String id = parsedMessage.get("id");
-                Date submitDate = new Date(Long.parseLong(parsedMessage.get("submitDate"))*1000);
-                Date doneDate = new Date(Long.parseLong(parsedMessage.get("doneDate"))*1000);
-                String status = parsedMessage.get("stat").trim();
-                String err = parsedMessage.get("err").trim();
+                id = parsedMessage.get("id");
+                submitDate = new Date(Long.parseLong(parsedMessage.get("submitDate"))*1000);
+                doneDate = new Date(Long.parseLong(parsedMessage.get("doneDate"))*1000);
+                status = parsedMessage.get("stat").trim();
+                err = parsedMessage.get("err").trim();
                 
-                if(status.equals(Constants.statusDelivered)){
+                if(status.intern() == Constants.statusDelivered.intern()){
                 	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 7, err);
-                }else if(status.equals(Constants.statusExpired)){
+                }else if(status.intern() == Constants.statusExpired.intern()){
                 	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 6, err);
-                }else if(status.equals(Constants.statusDeleted)){
+                }else if(status.intern() == Constants.statusDeleted.intern()){
                 	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 5, err);
-                }else if(status.equals(Constants.statusUndeliverable)){
+                }else if(status.intern() == Constants.statusUndeliverable.intern()){
                 	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 4, err);
-                }else if(status.equals(Constants.statusAccepted)){
+                }else if(status.intern() == Constants.statusAccepted.intern()){
                 	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 3, err);
-                }else if(status.equals(Constants.statusRejected)){
+                }else if(status.intern() == Constants.statusRejected.intern()){
                 	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, 2, err);
                 }else{
                 	msisdn.acceptDeliveryReport(deliverSM.getSourceAddr().getAddress().trim(), id, submitDate, doneDate, -1, err);
