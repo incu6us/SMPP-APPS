@@ -24,7 +24,7 @@
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/sami" />
+		<property name="url" value="jdbc:mysql://localhost:3306/sami?autoReconnect=true&amp;useUnicode=true&amp;createDatabaseIfNotExist=true&amp;characterEncoding=utf-8" />
 		<property name="username" value="root" />
 		<property name="password" value="666666" />
 	</bean>
@@ -48,7 +48,10 @@
 				<prop key="hibernate.c3p0.max_statements">50</prop>
 				<prop key="hibernate.c3p0.idle_test_period">3000</prop>
 				<prop key="hibernate.jdbc.batch_size">20</prop>
-				<prop key="hibernate.generate_statistics">true</prop>
+				<prop key="hibernate.connection.CharSet">utf8</prop>
+        		<prop key="hibernate.connection.characterEncoding">utf8</prop>
+        		<prop key="hibernate.connection.useUnicode">true</prop>
+<!-- 				<prop key="hibernate.generate_statistics">true</prop> -->
 			</props>
 		</property>
 

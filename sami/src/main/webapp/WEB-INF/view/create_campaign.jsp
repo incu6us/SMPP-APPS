@@ -89,20 +89,26 @@
 		<div class="form-group">
 		  <label class="col-md-4 control-label" for="radios">SMPP System ID</label>
 		  <div class="col-md-4">
-		  <div class="radio" style="background-color: #fff;">
-		    <label for="radios-0">
-		      <input name="radios" id="radios-0" value="" checked="checked" type="radio">
-		      <label class="label label-default">- ALL ACTIVE SYSTEM IDs -</label>
-		    </label>
-			</div>
-		  <c:forEach items="${smppSettings}" var="smpp">
-		  <div class="radio" style="background-color: #fff;">
-		    <label for="radios-${smpp.systemId}">
-		      <input name="radios" id="radios-${smpp.systemId}" value="${smpp.id}" type="radio">
-		      <label class="label label-default">${smpp.systemId}</label> <label id="status-${smpp.systemId}"><span class="label label-success label-xs">free</span></label>
-		    </label>
-			</div>
-		  </c:forEach>
+		  <table class="table table-hover" style="background-color: #dff0d8">
+		  	<tr><td>
+			    <label for="radios-0">
+			      <input name="radios" id="radios-0" value="" checked="checked" type="radio">
+			      <label class="label label-default">- ALL ACTIVE SYSTEM IDs -</label></label>
+			    
+			</td><td></td></tr>
+			
+			  <c:forEach items="${smppSettings}" var="smpp">
+			<tr><td>
+			    <label for="radios-${smpp.systemId}">
+			      <input name="radios" id="radios-${smpp.systemId}" value="${smpp.id}" type="radio">
+			      <label class="label label-default">${smpp.systemId}</label></label>
+			</td><td>
+			       <label id="status-${smpp.systemId}"><span class="label label-success label-xs">free</span></label>
+			</td></tr>
+			    
+			  </c:forEach>
+		  
+		  </table>
 		  </div>
 		</div>
 		

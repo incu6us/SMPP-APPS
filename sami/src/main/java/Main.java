@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -17,6 +19,7 @@ import ua.com.life.smpp.db.service.TextForCampaignManage;
 import ua.com.life.smpp.db.domain.SmppSettings;
 import ua.com.life.smpp.db.service.SmppManage;
 import ua.com.life.smpp.db.service.SmppManageImpl;
+import ua.com.life.smpp.sami.smpp.MessageSpliter;
 import ua.com.life.smpp.sami.smpp.SmppConnection;
 
 public class Main {
@@ -25,8 +28,8 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 
-		ApplicationContext ctx = new FileSystemXmlApplicationContext(
-				"src/main/webapp/WEB-INF/manual-context.xml");
+//		ApplicationContext ctx = new FileSystemXmlApplicationContext(
+//				"src/main/webapp/WEB-INF/manual-context.xml");
 		
 //		SmppManage smppSettings = (SmppManage) ctx.getBean("smppManageImpl");
 

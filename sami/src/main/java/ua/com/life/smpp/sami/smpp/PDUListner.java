@@ -79,6 +79,8 @@ public class PDUListner implements ServerPDUEventListener {
 //                LOGGER.debug("SMS length: " + deliverSM.getSmLength());
 //                LOGGER.debug("SMS: " + deliverSM.getShortMessage());
                 
+                LOGGER.info("DeliverSM: "+deliverSM.getShortMessage());
+                
                 parsedMessage = parseShortMessage(deliverSM.getShortMessage().intern());
                 
                 dateFormat = new SimpleDateFormat();

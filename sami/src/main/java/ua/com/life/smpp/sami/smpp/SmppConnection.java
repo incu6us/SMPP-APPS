@@ -23,6 +23,7 @@ import org.smpp.pdu.SubmitSMResp;
 import org.smpp.pdu.Unbind;
 import org.smpp.pdu.UnbindResp;
 import org.smpp.pdu.WrongLengthOfStringException;
+import org.smpp.util.ByteBuffer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -43,6 +44,8 @@ public class SmppConnection {
 	 * File with default settings for the application.
 	 */
 	private String propsFilePath = Constants.propsFilePath;
+	
+	private MessageSpliter messageSpliter = new MessageSpliter();
 	
 	/**
 	 * This is the SMPP session used for communication with SMSC.
@@ -382,52 +385,78 @@ public class SmppConnection {
 	public void submit(String destAddress, String shortMessage, String sender, String validityPeriod) {
 		byte senderTon = 0;
 		byte senderNpi = 0;
-
+		
+		String[] splittedMsg = null;
+		int totalSegments = 0;
+		
+//		try {
+//			splittedMsg = messageSpliter.SplitByWidth(shortMessage, 63);
+//			totalSegments = splittedMsg.length;
+//		} catch (Exception e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		}
+		
+				
 		if(!isBound()){
 			bind();
 		}
 
 		try {
-			SubmitSM request = new SubmitSM();
-			// SubmitSMResp response;
-			// set values
-			request.setServiceType(serviceType);
-			if (sender != null) {
-				if (sender.matches("\\d+")) {
-					senderTon = 5;
-					senderNpi = 0;
-				}
-				if (!sender.matches("\\d+")) {
-					senderTon = 1;
-					senderNpi = 1;
-				}
-				if (senderTon == 5) {
-					request.setSourceAddr(new Address(senderTon, senderNpi, sender, 11));
+//			for (int i = 0; i < totalSegments; i++) {
+				SubmitSM request = new SubmitSM();
+				// set values
+				request.setServiceType(serviceType);
+				if (sender != null) {
+					if (sender.matches("\\d+")) {
+						senderTon = 1;
+						senderNpi = 1;
+					}
+					if (!sender.matches("\\d+")) {
+						senderTon = 5;
+						senderNpi = 0;
+					}
+					if (senderTon == 5) {
+						request.setSourceAddr(new Address(senderTon, senderNpi, sender, 11));
+					} else {
+						request.setSourceAddr(new Address(senderTon, senderNpi, sender));
+					}
 				} else {
-					request.setSourceAddr(new Address(senderTon, senderNpi, sender));
+					request.setSourceAddr(sourceAddress);
 				}
-			} else {
-				request.setSourceAddr(sourceAddress);
-			}
-			if (destAddress.startsWith("+")) {
-				destAddress = destAddress.substring(1);
-			}
-			request.setDestAddr(new Address((byte) 1, (byte) 1, destAddress));
-			request.setReplaceIfPresentFlag(replaceIfPresentFlag);
-			// request.setShortMessage(shortMessage, Data.ENC_GSM7BIT);
-			request.setScheduleDeliveryTime(scheduleDeliveryTime);
-			request.setValidityPeriod(validityPeriod);
-			request.setEsmClass(esmClass);
-			request.setProtocolId(protocolId);
-			request.setPriorityFlag(priorityFlag);
-			request.setRegisteredDelivery(registeredDelivery);
-			request.setDataCoding(dataCoding);
-			request.setSmDefaultMsgId(smDefaultMsgId);
-			// request.setPayloadType(new
-			// ByteBuffer(shortMessage.getBytes("UTF-8")));
-			// send the request
-			request.assignSequenceNumber(true);
-			session.submit(request);
+				if (destAddress.startsWith("+")) {
+					destAddress = destAddress.substring(1);
+				}
+				request.setDestAddr(new Address((byte) 1, (byte) 1, destAddress));
+				request.setReplaceIfPresentFlag(replaceIfPresentFlag);
+	//			request.setShortMessage(shortMessage, Data.ENC_GSM7BIT);
+	//			request.setShortMessage(shortMessage);
+				request.setScheduleDeliveryTime(scheduleDeliveryTime);
+				request.setValidityPeriod(validityPeriod);
+				request.setEsmClass(esmClass);
+				request.setProtocolId(protocolId);
+				request.setPriorityFlag(priorityFlag);
+				request.setRegisteredDelivery(registeredDelivery);
+				request.setDataCoding(dataCoding);
+				request.setSmDefaultMsgId(smDefaultMsgId);
+				request.assignSequenceNumber(true);
+	
+//				ByteBuffer ed = new ByteBuffer();
+//				ed.appendByte((byte) 6); // UDH Length
+//				ed.appendByte((byte) 0x08); // IE Identifier
+//				ed.appendByte((byte) 4); // IE Data Length
+//				ed.appendByte((byte) 00) ; //Reference Number 1st Octet
+//				ed.appendByte((byte) 00) ; //Reference Number 2nd Octet
+//				ed.appendByte((byte) totalSegments) ; //Number of pieces
+//				ed.appendByte((byte) (i+1)) ; //Sequence number
+//				//This encoding comes in Logica Open SMPP. Refer to its docs for more detail
+//				ed.appendBytes(splittedMsg[i].getBytes(Data.ENC_UTF16_BE));
+//				request.setShortMessageData(ed);
+
+				request.setMessagePayload(new ByteBuffer(shortMessage.getBytes(Data.ENC_UTF16_BE)));
+				// send the request
+				session.submit(request);
+//			}
 		} catch (Exception e) {
 //			System.out.println("Submit operation failed. " + e);
 			LOGGER.error("Submit operation failed. " + e);

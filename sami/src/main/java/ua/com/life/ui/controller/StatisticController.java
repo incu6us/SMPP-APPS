@@ -44,11 +44,13 @@ public class StatisticController {
 		
 		for(Campaign campaign : campaigns){
 //			ComparedMessageObject messageObject = new ComparedMessageObject(campaign.getCampaignId(), campaign.getName(), campaign.getSourceAddr(), text.getTextForCampaignByCompaignId(campaign.getCampaignId()).getText());
-			ComparedMessageObject messageObject = new ComparedMessageObject(campaign.getCampaignId(), campaign.getName(), campaign.getSourceAddr(), 
+			try{
+				ComparedMessageObject messageObject = new ComparedMessageObject(campaign.getCampaignId(), campaign.getName(), campaign.getSourceAddr(), 
 					text.getTextForCampaignByCompaignId(campaign.getCampaignId()).getText(), msisdn.totalMessagesByCampaignId(campaign.getCampaignId()), msisdn.inActionMessagesByCampaignId(campaign.getCampaignId()),
 					msisdn.successMessagesByCampaignId(campaign.getCampaignId()), msisdn.unsuccessMessagesByCampaignId(campaign.getCampaignId()));
-			
-			messageObjects.add(messageObject);
+				messageObjects.add(messageObject);
+			}catch(NullPointerException e){
+			}
 		}
 		
 		model.addAttribute("pageName", "stat");
