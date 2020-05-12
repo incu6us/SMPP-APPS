@@ -319,7 +319,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
-		<spring.version>4.0.5.RELEASE</spring.version>
+		<spring.version>5.2.6.RELEASE</spring.version>
 		<hibernate.version>4.2.11.Final</hibernate.version>
 		<org.springframework-version>3.2.4.RELEASE</org.springframework-version>
 		<jersey.version>1.18.1</jersey.version>
